@@ -16,6 +16,7 @@
 
 /* Then specific styles */
 @import './styles/vault.css';
+@import './styles/vault-nosubscroll.css';
 @import './styles/dashboard.css';
 @import './styles/ai-web3.css';
 

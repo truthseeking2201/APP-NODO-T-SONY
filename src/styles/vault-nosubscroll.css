@@ -1,0 +1,22 @@
+/* Scope to the vault page only */
+.vault-page .card-no-scroll {
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* If shadcn/radix ScrollArea is used, disable its viewport scrolling */
+.vault-page .card-no-scroll [data-radix-scroll-area-viewport],
+.vault-page .card-no-scroll .scroll-area-viewport,
+.vault-page .card-no-scroll .ScrollAreaViewport {
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* Hide any masking gradients used to hint scrolling */
+.vault-page .card-no-scroll .scroll-gradient,
+.vault-page .card-no-scroll .mask-fade {
+  display: none !important;
+}
+

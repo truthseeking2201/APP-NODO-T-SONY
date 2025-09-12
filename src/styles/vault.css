@@ -1,4 +1,16 @@
 
+:root { 
+  --vault-sticky-top: 36px; /* adjust to your header height */
+}
+
+/* Sticky helpers for Vault Detail */
+.vault-sticky { position: sticky; top: var(--vault-sticky-top); }
+.vault-sticky-ancestor { overflow: visible; }
+
+@media (max-width: 1023px) {
+  .vault-sticky { position: static; top: auto; }
+}
+
 @layer components {
   .risk-moderate {
     @apply bg-orion-500/30 text-orion-500;

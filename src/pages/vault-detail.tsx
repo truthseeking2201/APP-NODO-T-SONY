@@ -12,6 +12,8 @@ import VaultInfo from "@/components/vault-detail/sections/vault-info";
 import YourHoldings from "@/components/vault-detail/sections/your-holdings";
 import StickyAsideLayout from "@/shared/layouts/StickyAsideLayout";
 import ManageLiquidityCard from "@/features/vaults/components/ManageLiquidityCard";
+import { useVaultTab } from "@/features/vault-detail/useTab";
+import { UnderlineTabs } from "@/components/ui/UnderlineTabs";
 import { EXCHANGE_CODES_MAP } from "@/config/vault-config";
 import { useGetDepositVaults, useVaultBasicDetails } from "@/hooks";
 import { formatAmount } from "@/lib/utils";
@@ -121,6 +123,8 @@ const VaultDetail = () => {
     image: "",
   };
 
+  const [tab, setTab] = useVaultTab();
+
   const Header = (
     <header
       className="relative bg-gradient-to-b from-[#0c0c0d] to-transparent pt-6 pb-6"
@@ -150,33 +154,49 @@ const VaultDetail = () => {
 
   const LeftColumn = (
     <div className="space-y-6">
-      <YourHoldings
-        isDetailLoading={isDetailLoading}
-        vault_id={vault_id as string}
-        vault={vaultDetails as BasicVaultDetailsType}
+      <UnderlineTabs
+        value={tab}
+        onValueChange={(v) => setTab(v as any)}
+        items={[
+          { value: "overview", label: "Overview" },
+          { value: "holdings", label: "Your Holdings" },
+        ]}
+        className="mt-2"
       />
 
-      <VaultAnalytics
-        vault_id={vault_id as string}
-        isDetailLoading={isDetailLoading}
-        vault={vaultDetails}
-      />
+      {tab === "overview" && (
+        <div className="space-y-6">
+          <VaultAnalytics
+            vault_id={vault_id as string}
+            isDetailLoading={isDetailLoading}
+            vault={vaultDetails}
+          />
+          <VaultActivities isDetailLoading={isDetailLoading} vault_id={vault_id} />
+          <StrategyExplanation vault={vaultDetails} isDetailLoading={isDetailLoading} />
+          <VaultInfo vaultDetails={vaultDetails} isDetailLoading={isDetailLoading} />
+          <HelpfulInfo isDetailLoading={isDetailLoading} />
+        </div>
+      )}
 
-      <VaultActivities isDetailLoading={isDetailLoading} vault_id={vault_id} />
-
-      <StrategyExplanation vault={vaultDetails} isDetailLoading={isDetailLoading} />
-
-      <VaultInfo vaultDetails={vaultDetails} isDetailLoading={isDetailLoading} />
-
-      <HelpfulInfo isDetailLoading={isDetailLoading} />
+      {tab === "holdings" && (
+        <div className="space-y-6">
+          <YourHoldings
+            isDetailLoading={isDetailLoading}
+            vault_id={vault_id as string}
+            vault={vaultDetails as BasicVaultDetailsType}
+          />
+        </div>
+      )}
     </div>
   );
 
-  const RightColumn = <ManageLiquidityCard vault_id={vault_id as string} />;
+  const RightColumn = (
+    <ManageLiquidityCard vault_id={vault_id as string} />
+  );
 
   return (
-    <PageContainer backgroundImage={DetailsBackground} className="max-md:py-0 py-0">
-      <StickyAsideLayout header={Header} left={LeftColumn} right={RightColumn} topOffsetPx={96} />
+    <PageContainer backgroundImage={DetailsBackground} className="vault-page max-md:py-0 py-0 pb-[160px]">
+      <StickyAsideLayout header={Header} left={LeftColumn} right={RightColumn} topOffsetPx={36} />
     </PageContainer>
   );
 };

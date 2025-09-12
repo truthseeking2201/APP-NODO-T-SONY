@@ -184,6 +184,7 @@ const YourHoldings = ({
   }, [isAuthenticated]);
 
   return (
+    <div className="card-no-scroll">
     <DetailWrapper
       title={
         userState !== "nonDeposit" ? "Your Holdings" : "Welcome to NODO Vault!"
@@ -272,14 +273,7 @@ const YourHoldings = ({
                 />
                 <div className="flex md:gap-4 gap-1 items-center">
                   <div className="flex-1">
-                    <div
-                      className="mdmax-h-[150px] max-h-[100px] overflow-auto pr-2"
-                      style={{
-                        scrollbarWidth: "thin",
-                        scrollbarColor: "#555 transparent",
-                        WebkitOverflowScrolling: "touch",
-                      }}
-                    >
+                    <div className="pr-2">
                       {userState === "pending" && (
                         <div className="flex gap-2 flex-col">
                           {userHoldingData?.user_vault_tokens?.map(
@@ -689,6 +683,7 @@ const YourHoldings = ({
         </AnimatePresence>
       </ConditionRenderer>
     </DetailWrapper>
+    </div>
   );
 };
 
