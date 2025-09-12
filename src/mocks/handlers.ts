@@ -67,6 +67,40 @@ export const handlers = [
 
   // ---- Activities
   http.get("/data-management/external/position-requests", async () => ok(mockVaultActivitiesPage)),
+  
+  // Override Activities with filters + pagination
+  http.get("/data-management/external/position-requests", async ({ request }) => {
+    try {
+      const { mockActivities } = await import("./fixtures/activities");
+      const url = new URL(request.url);
+      const vaultId = url.searchParams.get("vault_id") ?? "nodo-nova-usdc";
+      const action = url.searchParams.get("action_type") ?? "";
+      const page = parseInt(url.searchParams.get("page") ?? "1", 10);
+      const limit = parseInt(url.searchParams.get("limit") ?? "25", 10);
+  
+      let rows = mockActivities.filter((a) => a.vault_id === vaultId);
+      if (action) rows = rows.filter((a) => a.action_type === (action as any));
+  
+      const total = rows.length;
+      const start = (page - 1) * limit;
+      const items = rows.slice(start, start + limit).map((r) => ({
+        id: r.id,
+        vault_id: r.vault_id,
+        action_type: r.action_type,
+        action: r.action_type,
+        amount_in_usd: r.amount_in_usd,
+        amountUsd: r.amount_in_usd,
+        created_at: r.created_at,
+        createdAt: r.created_at,
+        hash: r.hash,
+        status: r.status,
+      }));
+  
+      return ok({ page, limit, total, items });
+    } catch (e) {
+      return ok({ page: 1, limit: 25, total: 0, items: [] });
+    }
+  }),
 
   // ---- Analytics
   http.get("/data-management/external/vaults/:vaultId/histogram", async () => ok(mockVaultAnalytics)),
@@ -109,6 +143,15 @@ export const handlers = [
       { token_id: 1, token_symbol: "USDC", token_name: "USDC", token_address: "" + Object.values(mockBasicDetails)[0].collateral_token, decimal: 6, url: "", exchange_id: 1, min_deposit_amount: "0", min_deposit_amount_usd: "0" },
     ])
   ),
+  // Support alternate deposit tokens endpoint
+  http.get("/data-management/external/vaults/deposit-tokens", async () =>
+    ok([
+      { token_id: 1, token_symbol: "USDC", token_name: "USDC", token_address: "" + Object.values(mockBasicDetails)[0].collateral_token, decimal: 6, url: "", exchange_id: 1, min_deposit_amount: "0", min_deposit_amount_usd: "0" },
+    ])
+  ),
+
+  // Check deposit: always allow in mock mode
+  http.get("/data-management/external/vaults/:vaultId/check-deposit", async () => ok({ can_deposit: true })),
 
   // ---- Leaderboards
   http.get("/data-management/external/user/leaderboard/this-week-leaderboard", async ({ request }) => {

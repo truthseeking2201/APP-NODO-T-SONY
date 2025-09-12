@@ -1,4 +1,5 @@
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { IS_MOCK } from "@/config/mock";
 import { useMemo } from "react";
 import { create } from "zustand";
 interface WalletState {
@@ -33,6 +34,7 @@ export const useWallet = () => {
   } = useWalletStore((state) => state);
 
   const calculateIsAuthenticated = useMemo(() => {
+    if (IS_MOCK) return true;
     if (isAuthenticated) return true;
 
     const access_token = localStorage.getItem("access_token");
