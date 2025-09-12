@@ -1,5 +1,6 @@
 import axios from "axios";
-const baseURL = import.meta.env.VITE_NODO_APP_URL || "https://api-dev.nodo.xyz";
+import { IS_MOCK } from "@/config/mock";
+const baseURL = IS_MOCK ? "" : (import.meta.env.VITE_NODO_APP_URL ?? "");
 
 const URLS = {
   login: "/data-management/auth/login",

@@ -3,8 +3,9 @@ import {
   WithdrawalRequests,
 } from "@/types/vault-config.types";
 import http from "@/utils/http";
+import { IS_MOCK } from "@/config/mock";
 
-const NODO_URL = import.meta.env.VITE_NODO_APP_URL;
+const NODO_URL = IS_MOCK ? "" : (import.meta.env.VITE_NODO_APP_URL ?? "");
 
 const URLS = {
   latestWithdrawal: `/data-management/external/withdrawals/latest`,
@@ -67,7 +68,7 @@ const URLS = {
     `/data-management/external/user/vault-stats?vault_id=${vaultId}&ndlp_balance=${ndlp_balance}`,
   estimateDualDeposit: (vaultId: string) =>
     `/data-management/external/vaults/${vaultId}/estimate-deposit-dual`,
-  depositTokens: `data-management/external/vaults/list-deposit-tokens`,
+  depositTokens: `/data-management/external/vaults/list-deposit-tokens`,
 };
 
 export const getLatestWithdrawal = (sender_address: string) => {

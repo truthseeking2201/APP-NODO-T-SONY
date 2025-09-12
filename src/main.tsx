@@ -3,14 +3,18 @@ import "./instrument";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { enableMocking } from "@/mocks/enableMocks";
 
 // Simplify the rendering process to reduce potential errors
-const rootElement = document.getElementById("root");
+async function bootstrap() {
+  await enableMocking();
 
-if (!rootElement) {
-  console.error("Root element not found!");
-} else {
-  // Mount app immediately
+  const rootElement = document.getElementById("root");
+  if (!rootElement) {
+    console.error("Root element not found!");
+    return;
+  }
+
   const root = createRoot(rootElement);
   root.render(
     // <React.StrictMode>
@@ -18,3 +22,5 @@ if (!rootElement) {
     // </React.StrictMode>
   );
 }
+
+bootstrap();

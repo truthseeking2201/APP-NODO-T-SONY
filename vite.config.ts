@@ -1,11 +1,13 @@
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import svgr from "vite-plugin-svgr";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isProduction = mode === "production";
+  const env = loadEnv(mode, process.cwd(), "");
+  const useMocks = (env.VITE_USE_MOCKS ?? "true") !== "false";
 
   return {
     server: {
@@ -31,6 +33,15 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        ...(useMocks
+          ? {
+              "@mysten/dapp-kit": path.resolve(__dirname, "src/mocks/dapp-kit.tsx"),
+              "@mysten/sui/client": path.resolve(__dirname, "src/mocks/sui-client.ts"),
+              "@mysten/sui/transactions": path.resolve(__dirname, "src/mocks/transactions.ts"),
+              "@mysten/sui/bcs": path.resolve(__dirname, "src/mocks/bcs.ts"),
+              "@pythnetwork/pyth-sui-js": path.resolve(__dirname, "src/mocks/pyth-sui-js.ts"),
+            }
+          : {}),
       },
     },
   };

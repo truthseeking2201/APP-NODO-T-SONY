@@ -1,4 +1,5 @@
 import axios from "axios";
+import { IS_MOCK } from "@/config/mock";
 import { jwtDecode } from "jwt-decode";
 import { triggerWalletDisconnect } from "./wallet-disconnect";
 
@@ -89,7 +90,7 @@ const getValidToken = async (
   }
 };
 
-const baseURL = import.meta.env.VITE_NODO_APP_URL || "https://api-dev.nodo.xyz";
+const baseURL = IS_MOCK ? "" : (import.meta.env.VITE_NODO_APP_URL ?? "");
 
 const http = axios.create({
   baseURL: baseURL,
