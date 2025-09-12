@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { TokenIcon } from "@/components/ui/TokenIcon";
 import BigNumber from "bignumber.js";
 import Web3Button from "@/components/ui/web3-button";
 import { RowItem } from "@/components/ui/row-item";
@@ -40,14 +41,8 @@ const ClaimToken = ({
   const rightInput = useMemo(() => {
     return (
       <div className="flex items-center">
-        <img
-          src={data.tokenWithdraw.image}
-          alt={data.tokenWithdraw.token_symbol}
-          className="md:w-6 md:h-6 w-5 h-5 mr-2"
-        />
-        <span className="font-mono text-sm md:text-lg font-bold text-gray-200">
-          {data.tokenWithdraw.token_symbol}
-        </span>
+        <TokenIcon symbol={data.tokenWithdraw.token_symbol} className="md:w-6 md:h-6 w-5 h-5 mr-2" />
+        <span className="font-mono text-sm md:text-lg font-bold text-gray-200">{data.tokenWithdraw.token_symbol}</span>
       </div>
     );
   }, [data]);

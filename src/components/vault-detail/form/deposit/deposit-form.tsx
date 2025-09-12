@@ -21,6 +21,7 @@ import { useDepositVault } from "@/hooks/use-deposit-vault";
 import { useToast } from "@/hooks/use-toast";
 import { useTokenPrices } from "@/hooks/use-token-price";
 import { getBalanceAmountForInput, getDecimalAmount } from "@/lib/number";
+import { IS_MOCK } from "@/config/mock";
 import { cn, formatAmount } from "@/lib/utils";
 import BigNumber from "bignumber.js";
 import debounce from "lodash-es/debounce";
@@ -293,6 +294,10 @@ const DepositForm = ({ vault_id }: { vault_id: string }) => {
   const handleSendRequestDeposit = async () => {
     try {
       setLoading(true);
+      if (IS_MOCK) {
+        handleDepositSuccessCallback({ digest: "0xMOCK_TX" } as any);
+        return;
+      }
       const depositCoin = {
         coin_type: collateralToken?.token_address,
         decimals: collateralToken?.decimals,

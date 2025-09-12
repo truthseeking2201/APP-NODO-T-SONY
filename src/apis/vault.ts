@@ -95,9 +95,56 @@ export const getWithdrawalRequestsMultiTokens = (params: any) => {
   });
 };
 
-export const getVaultsActivities = (payload: any) => {
+export const getVaultsActivities = async (payload: any) => {
   const { page, limit, action_type, vault_id } = payload;
-  return http.get(URLS.positionRequests(page, limit, action_type, vault_id));
+  const res = (await http.get(
+    URLS.positionRequests(page, limit, action_type, vault_id)
+  )) as any;
+
+  const root = res ?? {};
+  const items = root.items ?? [];
+  const total = root.total ?? (Array.isArray(items) ? items.length : 0);
+  const mapped = items.map((r: any) => ({
+    id: r.id,
+    type: r.action_type,
+    time: r.created_at,
+    vault_address: r.vault_id,
+    tokens: [
+      r.token_in
+        ? {
+            token_id: 1,
+            token_name: r.token_in,
+            token_symbol: r.token_in,
+            token_address: "",
+            decimal: 6,
+            amount: 1000000, // display as 1.0 when decimal=6
+            price: "0",
+            url: "",
+            createdAt: r.created_at,
+            updatedAt: r.created_at,
+          }
+        : null,
+      r.token_out
+        ? {
+            token_id: 2,
+            token_name: r.token_out,
+            token_symbol: r.token_out,
+            token_address: "",
+            decimal: 6,
+            amount: 1000000,
+            price: "0",
+            url: "",
+            createdAt: r.created_at,
+            updatedAt: r.created_at,
+          }
+        : null,
+    ].filter(Boolean),
+    txhash: r.hash,
+    status: r.status,
+    value: String(r.amount_in_usd ?? 0),
+  }));
+
+  return { list: mapped, total, page: root.page ?? 1, limit: root.limit ?? limit };
 };
 
 export const getDepositVaults = (accountAddress?: string) => {

@@ -8,3 +8,14 @@ export const IS_MOCK =
     ? import.meta.env.VITE_USE_MOCKS !== "false"
     : true;
 
+export const MOCK_ADDRESS = "0xMOCK_WALLET";
+export const ONE_MILLION = 1_000_000;
+
+export const COIN_DECIMALS: Record<string, number> = {
+  USDC: 6,
+  SUI: 9,
+  NDLP: 6,
+};
+
+export const asUnits = (n: number, decimals: number) =>
+  (BigInt(n) * (10n ** BigInt(decimals))).toString();

@@ -7,6 +7,8 @@ import {
 import BigNumber from "bignumber.js";
 import { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import { TokenIcon } from "@/components/ui/TokenIcon";
+import { toNumber } from "@/utils/num";
 import { DualDepositForm } from "./dual-deposit-form";
 import { TriangleAlert } from "lucide-react";
 import useBreakpoint from "@/hooks/use-breakpoint";
@@ -29,11 +31,13 @@ const calculateTargetAmount = (
   decimals: number,
   minTargetAmount: number
 ) => {
-  const { amount_a, amount_b } = estimateDualDeposit;
+  const { amount_a, amount_b } = estimateDualDeposit || ({} as any);
+  const src = toNumber(sourceAmount);
+  const a = toNumber(amount_a);
+  const b = toNumber(amount_b);
+  if (!a || !b || !Number.isFinite(src)) return "0";
   if (coinType === "token_a") {
-    const result = new BigNumber(
-      (Number(sourceAmount) * Number(amount_a)) / Number(amount_b)
-    );
+    const result = new BigNumber((src * a) / b);
 
     if (result.lt(minTargetAmount)) {
       return "0";
@@ -41,9 +45,7 @@ const calculateTargetAmount = (
 
     return result.toFixed(decimals);
   } else if (coinType === "token_b") {
-    const result = new BigNumber(
-      (Number(sourceAmount) * Number(amount_b)) / Number(amount_a)
-    );
+    const result = new BigNumber((src * b) / a);
     if (result.lt(minTargetAmount)) {
       return "0";
     }
@@ -175,14 +177,8 @@ const DepositDualInput = ({
             }
             rightInput={
               <div className="flex items-center">
-                <img
-                  src={`/coins/${tokenA.symbol?.toLowerCase()}.png`}
-                  alt={tokenA.symbol}
-                  className="md:w-6 md:h-6 mr-2 w-5 h-5"
-                />
-                <span className="font-mono text-sm md:text-lg font-bold text-gray-200">
-                  {tokenA.symbol}
-                </span>
+                <TokenIcon symbol={tokenA.symbol} className="md:w-6 md:h-6 mr-2 w-5 h-5" />
+                <span className="font-mono text-sm md:text-lg font-bold text-gray-200">{tokenA.symbol}</span>
               </div>
             }
           />
@@ -293,14 +289,8 @@ const DepositDualInput = ({
             }
             rightInput={
               <div className="flex items-center">
-                <img
-                  src={`/coins/${tokenB.symbol?.toLowerCase()}.png`}
-                  alt={tokenB.symbol}
-                  className="md:w-6 md:h-6 mr-2 w-5 h-5"
-                />
-                <span className="font-mono text-sm md:text-lg font-bold text-gray-200">
-                  {tokenB.symbol}
-                </span>
+                <TokenIcon symbol={tokenB.symbol} className="md:w-6 md:h-6 mr-2 w-5 h-5" />
+                <span className="font-mono text-sm md:text-lg font-bold text-gray-200">{tokenB.symbol}</span>
               </div>
             }
           />

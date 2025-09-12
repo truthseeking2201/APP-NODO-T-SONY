@@ -65,8 +65,7 @@ export const handlers = [
   http.get("/data-management/external/vaults/:vaultId/estimate-withdraw-dual", async () => ok(mockEstimateWithdrawDual)),
   http.get("/data-management/external/vaults/:vaultId/swap-and-deposit-info", async () => ok(mockSwapDepositInfo)),
 
-  // ---- Activities
-  http.get("/data-management/external/position-requests", async () => ok(mockVaultActivitiesPage)),
+  // ---- Activities (with filters + pagination)
   
   // Override Activities with filters + pagination
   http.get("/data-management/external/position-requests", async ({ request }) => {
@@ -130,6 +129,7 @@ export const handlers = [
 
   // ---- User holdings (Estimated LP Breakdown)
   http.get("/data-management/external/user/vault-stats", async () => ok(mockUserHolding)),
+  http.get("/data-management/external/vaults/:vaultId/user-holding", async () => ok(mockUserHolding)),
 
   // ---- Tokens / Prices / Deposit tokens
   http.post("/data-management/external/vaults/token-prices", async () =>

@@ -2,6 +2,7 @@ import { RowItem } from "@/components/ui/row-item";
 import DepositMethod from "@/components/vault-detail/form/deposit-method";
 import { LabelWithTooltip } from "@/components/ui/label-with-tooltip";
 import TransactionFee from "@/components/vault-detail/form/deposit/transaction-fee";
+import { TokenIcon, DexIcon } from "@/components/ui/TokenIcon";
 
 import { showFormatNumber } from "@/lib/number";
 import { cn } from "@/lib/utils";
@@ -32,17 +33,9 @@ const SummaryConfirmWithdraw = ({
         classNameLabel={classLable}
       >
         <div className="flex items-center gap-2">
-          <div className="relative flex-s flex max-md:text-sm">
-            <img
-              src={lpData.token_image}
-              alt={lpData.token_symbol}
-              className="absolute right-[18px] z-0 flex-shrink-0"
-            />
-            <img
-              src={lpData.quote_image}
-              alt={lpData.quote_symbol}
-              className={cn(classToken, "z-10 flex-shrink-0")}
-            />
+          <div className="relative flex-s flex max-md:text-sm items-center">
+            <TokenIcon symbol={lpData.token_symbol} className={cn(classToken, "mr-[-8px] z-0 flex-shrink-0")}/>
+            <TokenIcon symbol={lpData.quote_symbol} className={cn(classToken, "z-10 flex-shrink-0")}/>
           </div>
 
           <span className="font-mono max-md:text-13px text-lg text-white truncate max-w-[180px] sm:max-w-[280px]">
@@ -57,14 +50,8 @@ const SummaryConfirmWithdraw = ({
           classNameLabel={classLable}
         >
           <div className="flex items-center gap-1">
-            <img
-              src={lpData.exchange.image}
-              alt={lpData.exchange.name}
-              className=" w-4 h-4 inline"
-            />
-            <span className="font-sans max-md:text-sm text-base font-bold text-white">
-              {lpData.exchange.name}
-            </span>
+            <DexIcon name={lpData.exchange.name} className="w-4 h-4 inline" />
+            <span className="font-sans max-md:text-sm text-base font-bold text-white">{lpData.exchange.name}</span>
           </div>
         </RowItem>
       )}
@@ -74,11 +61,7 @@ const SummaryConfirmWithdraw = ({
         classNameLabel={classLable}
       >
         <div className="flex items-center max-md:text-sm">
-          <img
-            src={lpData?.lp_image}
-            alt="NODOAIx Token"
-            className={cn(classToken, "mr-2")}
-          />
+          <TokenIcon symbol={lpData?.lp_symbol} className={cn(classToken, "mr-2")} />
           {showFormatNumber(summary?.amount || 0)} {lpData?.lp_symbol}
         </div>
       </RowItem>
@@ -126,11 +109,7 @@ const SummaryConfirmWithdraw = ({
                 idx > 0 ? "mt-2" : ""
               )}
             >
-              <img
-                src={token?.image}
-                alt={token?.token_symbol}
-                className={cn(classToken, "mr-2")}
-              />
+              <TokenIcon symbol={token?.token_symbol} className={cn(classToken, "mr-2")} />
               <span className="text-gray-200 font-bold max-md:text-sm">
                 {showFormatNumber(token?.amount || "0")} {token?.token_symbol}
               </span>

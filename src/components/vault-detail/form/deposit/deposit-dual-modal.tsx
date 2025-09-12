@@ -13,6 +13,7 @@ import DepositMethod from "../deposit-method";
 import { DualDepositSuccessData } from "./dual-deposit-form";
 import { DepositDialogContent, DepositDialogHeader } from "./modal-dialog";
 import ModalRow from "./modal-row";
+import { TokenIcon } from "@/components/ui/TokenIcon";
 import TransactionFee from "./transaction-fee";
 import ModalVaultInfo from "./modal-vault-info";
 import NdlpTutorial from "./ndlp-tutorial";
@@ -178,11 +179,7 @@ const DepositDualModal = (props: DepositModalProps) => {
               label="Est. Max Receive"
               value={
                 <div className="font-mono font-bold text-sm md:text-lg flex items-center gap-1">
-                  <img
-                    src="/coins/ndlp.png"
-                    alt="NDLP"
-                    className="w-6 h-6 mr-1"
-                  />
+                  <TokenIcon symbol="NDLP" className="w-6 h-6 mr-1" />
                   {formattedNdlp} NDLP
                 </div>
               }

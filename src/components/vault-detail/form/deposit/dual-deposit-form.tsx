@@ -19,6 +19,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useTokenPrices } from "@/hooks/use-token-price";
 import { getBalanceAmountForInput } from "@/lib/number";
+import { IS_MOCK } from "@/config/mock";
 import { cn, formatAmount } from "@/lib/utils";
 import debounce from "lodash-es/debounce";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -29,6 +30,7 @@ import ConditionRenderer from "@/components/shared/condition-renderer";
 import DualDepositSkeleton from "./dual-deposit-skeleton";
 import RiskDisclosuresPopup from "./risk-disclosure-popup";
 import { useRiskDisclosure } from "@/hooks/use-risk-disclosure";
+import { TokenIcon } from "@/components/ui/TokenIcon";
 
 export type DualDepositSuccessData = {
   digest: string;
@@ -248,6 +250,15 @@ const DepositForm = ({ vault_id }: { vault_id: string }) => {
   const handleSendRequestDeposit = async () => {
     try {
       setLoading(true);
+      if (IS_MOCK) {
+        handleDepositSuccessCallback({
+          digest: "0xMOCK_TX",
+          ndlpReceived: 1000000,
+          actualInputAmountTokenA: 1000000,
+          actualInputAmountTokenB: 1000000,
+        } as any);
+        return;
+      }
       await deposit({
         coinA: {
           coin_type: tokenA.token_address,
@@ -358,16 +369,8 @@ const DepositForm = ({ vault_id }: { vault_id: string }) => {
                     })} `
                   : "--"}
               </DynamicFontText>
-              <div
-                className={
-                  "flex items-center gap-2 font-bold text-sm md:text-lg"
-                }
-              >
-                <img
-                  src="/coins/ndlp.png"
-                  alt="NDLP"
-                  className="w-6 h-6 max-md:mr-2"
-                />
+              <div className={"flex items-center gap-2 font-bold text-sm md:text-lg"}>
+                <TokenIcon symbol="NDLP" className="w-6 h-6 max-md:mr-2" />
                 {isMd && lpToken?.display_name}
               </div>
             </div>

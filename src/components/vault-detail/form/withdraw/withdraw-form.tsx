@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { TokenIcon } from "@/components/ui/TokenIcon";
 import { useForm, Controller } from "react-hook-form";
 import debounce from "lodash-es/debounce";
 import BigNumber from "bignumber.js";
@@ -100,14 +101,8 @@ export default function WithdrawForm({
   const rightInput = useMemo(() => {
     return (
       <div className="flex items-center">
-        <img
-          src={lpData.lp_image}
-          alt={lpData.lp_symbol}
-          className="md:w-6 md:h-6 mr-2 w-5 h-5"
-        />
-        <span className="font-mono text-sm md:text-lg font-bold text-gray-200">
-          {lpData.lp_symbol}
-        </span>
+        <TokenIcon symbol={lpData.lp_symbol} className="md:w-6 md:h-6 mr-2 w-5 h-5" />
+        <span className="font-mono text-sm md:text-lg font-bold text-gray-200">{lpData.lp_symbol}</span>
       </div>
     );
   }, [lpData]);
