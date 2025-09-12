@@ -1,0 +1,20 @@
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import Form from "@/components/vault-detail/form";
+
+type Props = {
+  vault_id: string;
+};
+
+export default function ManageLiquidityCard({ vault_id }: Props) {
+  return (
+    <Card className="rounded-2xl border-0 bg-[#1A1B1F] shadow-lg">
+      <CardHeader className="pb-2">
+        <div className="text-white/90 text-base font-semibold">Manage Liquidity</div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Form vault_id={vault_id} />
+      </CardContent>
+    </Card>
+  );
+}
+

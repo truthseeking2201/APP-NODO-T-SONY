@@ -121,7 +121,7 @@ const DepositForm = ({ vault_id }: { vault_id: string }) => {
     };
   }, [paymentTokens, pool, tokenPrices]);
 
-  const lpToken = useGetLpToken(vault.vault_lp_token, vault_id);
+  const lpToken = useGetLpToken((vault?.vault_lp_token as any), vault_id);
 
   const defaultValues = useMemo(() => {
     return {
@@ -235,8 +235,8 @@ const DepositForm = ({ vault_id }: { vault_id: string }) => {
         ndlpReceived: rest?.ndlpReceived
           ? getBalanceAmountForInput(
               rest.ndlpReceived,
-              vault.vault_lp_token_decimals,
-              vault.vault_lp_token_decimals
+              (lpToken?.decimals ?? vault?.vault_lp_token_decimals ?? 9),
+              (lpToken?.decimals ?? vault?.vault_lp_token_decimals ?? 9)
             )
           : +ndlpAmount,
       });
@@ -364,7 +364,7 @@ const DepositForm = ({ vault_id }: { vault_id: string }) => {
                 {ndlpAmount
                   ? ` ${formatAmount({
                       amount: ndlpAmount,
-                      precision: vault.vault_lp_token_decimals,
+                      precision: (lpToken?.decimals ?? vault?.vault_lp_token_decimals ?? 9),
                       stripZero: true,
                     })} `
                   : "--"}

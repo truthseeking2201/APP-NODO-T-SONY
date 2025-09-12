@@ -176,7 +176,7 @@ const DepositModal = (props: DepositModalProps) => {
                   1 {collateralTokenName} ={" "}
                   {formatAmount({
                     amount: confirmData?.conversionRate,
-                    precision: vault.vault_lp_token_decimals,
+                    precision: vault?.vault_lp_token_decimals ?? 6,
                   })}{" "}
                   NDLP
                 </span>
@@ -277,7 +277,7 @@ const DepositModal = (props: DepositModalProps) => {
                   <span className="font-mono font-bold text-sm md:text-lg text-white">
                     {formatAmount({
                       amount: depositSuccessData?.depositLpAmount,
-                      precision: vault.vault_lp_token_decimals,
+                      precision: vault?.vault_lp_token_decimals ?? 6,
                       stripZero: true,
                     })}{" "}
                     NDLP

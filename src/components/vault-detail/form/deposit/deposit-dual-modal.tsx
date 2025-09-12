@@ -271,7 +271,7 @@ const DepositDualModal = (props: DepositModalProps) => {
                   <span className="font-mono font-bold text-sm md:text-lg text-white">
                     {formatAmount({
                       amount: depositSuccessData?.ndlpReceived,
-                      precision: vault.vault_lp_token_decimals,
+                      precision: vault?.vault_lp_token_decimals ?? 6,
                       stripZero: true,
                     })}{" "}
                     NDLP
