@@ -259,7 +259,8 @@ const YourHoldings = ({
               exit={{ opacity: 0, height: 0 }}
               key="box"
             >
-              <HoldingCard>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <HoldingCard className="md:col-span-2">
                 <LabelWithTooltip
                   hasIcon={false}
                   label="Estimated LP Breakdown (secure, updates in ~1h)"
@@ -271,9 +272,42 @@ const YourHoldings = ({
                   }
                   labelClassName="text-white/60 md:text-sm text-[10px] mb-2 underline underline-offset-4 decoration-dotted decoration-gray-600"
                 />
-                <div className="flex md:gap-4 gap-1 items-center">
-                  <div className="flex-1">
-                    <div className="pr-2">
+                <div className="grid grid-cols-1 md:grid-cols-[140px_1fr] md:gap-4 gap-3 items-start">
+                  <div className="flex items-center justify-center md:justify-start order-1 md:order-none">
+                    {userState === "holding" && (
+                      <PieChart
+                        width={isMobile ? 86 : 120}
+                        height={isMobile ? 86 : 120}
+                        tabIndex={-1}
+                        className="cursor-not-allowed pointer-events-none select-none"
+                      >
+                        <Pie
+                          data={pieData}
+                          cx={isMobile ? 40 : 58}
+                          cy={isMobile ? 40 : 58}
+                          innerRadius={isMobile ? 32 : 48}
+                          outerRadius={isMobile ? 36 : 52}
+                          fill="#8884d8"
+                          dataKey="value"
+                          startAngle={0}
+                          endAngle={900}
+                          paddingAngle={3}
+                          cornerRadius={20}
+                        >
+                          {pieData.map((entry, idx) => (
+                            <Cell
+                              key={`cell-${idx}`}
+                              fill={COLORS[idx % COLORS.length]}
+                              stroke="none"
+                              pointerEvents="none"
+                            />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    )}
+                  </div>
+                  <div className="flex-1 order-2 md:order-none">
+                    <div className="pr-0 md:pr-2">
                       {userState === "pending" && (
                         <div className="flex gap-2 flex-col">
                           {userHoldingData?.user_vault_tokens?.map(
@@ -342,7 +376,7 @@ const YourHoldings = ({
                                   src={`/coins/${item.token_symbol.toLowerCase()}.png`}
                                   className="w-[18px] h-[18px] inline-flex self-center"
                                 />
-                                <div className="flex flex-col items-end md:max-w-[110px] max-w-[100px] justify-end flex-1">
+                                <div className="flex flex-col items-end justify-end flex-1">
                                   <div className="font-mono text-white md:text-sm text-xs">
                                     {formatNumber(
                                       item.amount,
@@ -376,42 +410,9 @@ const YourHoldings = ({
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center justify-center">
-                    {userState === "holding" && (
-                      <PieChart
-                        width={isMobile ? 86 : 120}
-                        height={isMobile ? 86 : 120}
-                        tabIndex={-1}
-                        className="cursor-not-allowed pointer-events-none select-none"
-                      >
-                        <Pie
-                          data={pieData}
-                          cx={isMobile ? 40 : 58}
-                          cy={isMobile ? 40 : 58}
-                          innerRadius={isMobile ? 32 : 48}
-                          outerRadius={isMobile ? 36 : 52}
-                          fill="#8884d8"
-                          dataKey="value"
-                          startAngle={0}
-                          endAngle={900}
-                          paddingAngle={3}
-                          cornerRadius={20}
-                        >
-                          {pieData.map((entry, idx) => (
-                            <Cell
-                              key={`cell-${idx}`}
-                              fill={COLORS[idx % COLORS.length]}
-                              stroke="none"
-                              pointerEvents="none"
-                            />
-                          ))}
-                        </Pie>
-                      </PieChart>
-                    )}
-                  </div>
                 </div>
               </HoldingCard>
-              <div className="flex gap-4">
+              <div className="grid gap-4 md:col-span-1">
                 <HoldingCard>
                   <LabelWithTooltip
                     hasIcon={false}
@@ -527,6 +528,7 @@ const YourHoldings = ({
                     )}
                   </div>
                 </HoldingCard>
+              </div>
               </div>
               <HoldingCard>
                 <div className="text-white text-sm font-bold mb-1">

@@ -14,7 +14,6 @@ import {
 import { mockDataLiveChart, mockDataLiveChart2 } from "../constant";
 
 const UserPosition = ({ period }) => {
-  console.log("UserPosition rendered with period:", period);
   const [timeFilter, setTimeFilter] = useState(period);
 
   const chartData = useMemo(() => {

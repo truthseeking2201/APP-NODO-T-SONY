@@ -8,8 +8,10 @@ import HelpfulInfo from "@/components/vault-detail/sections/helpful-info";
 import StrategyExplanation from "@/components/vault-detail/sections/strategy-explanation";
 import VaultActivities from "@/components/vault-detail/sections/vault-activities";
 import VaultAnalytics from "@/components/vault-detail/sections/vault-analytics";
+import UserPositionSection from "@/components/vault-detail/sections/user-position-section";
 import VaultInfo from "@/components/vault-detail/sections/vault-info";
-import YourHoldings from "@/components/vault-detail/sections/your-holdings";
+// import YourHoldings from "@/components/vault-detail/sections/your-holdings";
+import YourHoldingsCard from "@/features/vault-detail/cards/YourHoldingsCard";
 import StickyAsideLayout from "@/shared/layouts/StickyAsideLayout";
 import ManageLiquidityCard from "@/features/vaults/components/ManageLiquidityCard";
 import { useVaultTab } from "@/features/vault-detail/useTab";
@@ -171,6 +173,7 @@ const VaultDetail = () => {
             isDetailLoading={isDetailLoading}
             vault={vaultDetails}
           />
+          <UserPositionSection />
           <VaultActivities isDetailLoading={isDetailLoading} vault_id={vault_id} />
           <StrategyExplanation vault={vaultDetails} isDetailLoading={isDetailLoading} />
           <VaultInfo vaultDetails={vaultDetails} isDetailLoading={isDetailLoading} />
@@ -180,11 +183,7 @@ const VaultDetail = () => {
 
       {tab === "holdings" && (
         <div className="space-y-6">
-          <YourHoldings
-            isDetailLoading={isDetailLoading}
-            vault_id={vault_id as string}
-            vault={vaultDetails as BasicVaultDetailsType}
-          />
+          <YourHoldingsCard />
         </div>
       )}
     </div>
