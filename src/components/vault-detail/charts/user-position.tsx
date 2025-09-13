@@ -11,6 +11,7 @@ import {
   ReferenceLine,
   Dot,
 } from "recharts";
+import NdlpTooltip from "@/components/vault-detail/charts/NdlpTooltip";
 import { mockDataLiveChart, mockDataLiveChart2 } from "../constant";
 
 const UserPosition = ({ period }) => {
@@ -116,7 +117,7 @@ const UserPosition = ({ period }) => {
             tick={{ fill: "#9ca3af", fontSize: 12 }}
           />
 
-          <Tooltip />
+          <Tooltip content={<NdlpTooltip />} cursor={false} wrapperStyle={{ outline: "none" }} />
 
           <Line
             type="monotone"
