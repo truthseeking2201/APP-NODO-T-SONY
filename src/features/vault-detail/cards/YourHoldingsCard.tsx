@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { TokenIcon } from "@/components/ui/TokenIcon";
 import { ONE_MILLION } from "@/config/mock";
+import LoopingRiskMetrics from "@/features/vault-detail/cards/LoopingRiskMetrics";
 import { DetailWrapper } from "@/components/vault-detail/detail-wrapper";
 
 type Holding = { token: string; amount: number; amount_in_usd: number; percent?: number };
@@ -12,11 +13,14 @@ const COLORS = ["#6EE7F9", "#C4B5FD", "#34D399", "#FBBF24", "#F87171"];
 const fmtUSD = (n: number) =>
   (n ?? 0).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
 
+const fmtToken = (n: number, symbol: string) =>
+  `${(n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${symbol}`;
+
 const fmtNum = (n: number) => (n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
 
 export default function YourHoldingsCard() {
   const { vault_id } = useParams();
-  const [unit, setUnit] = useState<"NDLP" | "USD">("NDLP");
+  const [ndlpPrice, setNdlpPrice] = useState<number>(1.12);
   const [holdings, setHoldings] = useState<Holding[]>([
     { token: "USDC", amount: 600_000, amount_in_usd: 600_000 },
     { token: "SUI", amount: 300_000, amount_in_usd: 300_000 },
@@ -42,7 +46,21 @@ export default function YourHoldingsCard() {
       .catch(() => void 0);
   }, [vault_id]);
 
+  // Looping metrics hydration
+  const [looping, setLooping] = useState<{ is_looping?: boolean; metrics?: any }>({});
+  useEffect(() => {
+    const id = vault_id || "nodo-nova-usdc";
+    fetch(`/data-management/external/vaults/${id}/user-holding`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((json) => {
+        const root = json?.data || json || {};
+        setLooping({ is_looping: Boolean(root.is_looping), metrics: root.looping_metrics });
+      })
+      .catch(() => void 0);
+  }, [vault_id]);
+
   const totalUsd = holdings.reduce((a, b) => a + (b.amount_in_usd || 0), 0);
+  const totalNdlp = ndlpPrice > 0 ? totalUsd / ndlpPrice : 0;
 
   // Mock P&L and share (replace with real data wiring when available)
   const pnlRewards = 248;
@@ -57,17 +75,38 @@ export default function YourHoldingsCard() {
     return holdings.map((h) => ({ ...h, percent: Math.round(((h.amount_in_usd || 0) / sum) * 1000) / 10 }));
   }, [holdings, totalUsd]);
 
+  // Fetch current NDLP price if available (mock supported)
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/data-management/external/vaults/ndlp-prices`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ vault_ids: [vault_id || "nodo-nova-usdc"] }),
+      signal: controller.signal,
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((arr) => {
+        const price = Array.isArray(arr) ? Number(arr[0]?.ndlp_price_usd) : Number(arr?.ndlp_price_usd);
+        if (isFinite(price) && price > 0) setNdlpPrice(price);
+      })
+      .catch(() => void 0);
+    return () => controller.abort();
+  }, [vault_id]);
+
   return (
     <div className="card-no-scroll">
       <DetailWrapper title="Your Holdings">
       {/* Header band */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">Total Liquidity</div>
+        <div className="w-full">
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Total Liquidity</div>
           <div className="mt-1 text-4xl md:text-5xl font-semibold [font-variant-numeric:tabular-nums]">
             {fmtUSD(totalUsd)}
           </div>
-          <div className="mt-2 text-sm">
+          <div className="mt-1 text-2xl md:text-3xl font-semibold text-muted-foreground [font-variant-numeric:tabular-nums]">
+            {fmtToken(totalNdlp, "NDLP")}
+          </div>
+          <div className="mt-1 text-sm">
             <span className={pnlNet >= 0 ? "text-[#3FE6B0]" : "text-destructive"}>
               {pnlNet >= 0 ? "+" : "-"}
               {fmtUSD(Math.abs(pnlNet))}
@@ -77,22 +116,24 @@ export default function YourHoldingsCard() {
             </span>
           </div>
         </div>
-
-        <button
-          className="h-9 px-3 rounded-full bg-muted text-sm border border-border hover:bg-muted/80"
-          onClick={() => setUnit(unit === "NDLP" ? "USD" : "NDLP")}
-          aria-label="Toggle unit"
-        >
-          {unit} ↕
-        </button>
       </div>
 
       {/* KPI row */}
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <KPI title="24h Rewards" value={fmtUSD(12.5)} sub="Updates every 1h" />
-        <KPI title="Break-even" value="$1.00" sub="Current NDLP price: $1.12" />
+        <KPI title="Break-even" value="$1.00" sub={`Current NDLP price: $${ndlpPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}`} />
         <KPI title="Your Share" value={`${yourSharePct}%`} sub={`≈ ${fmtNum(yourShareNdlp)} / ${fmtNum(vaultNdlpSupply)} NDLP`} />
       </div>
+
+      {looping.is_looping && looping.metrics && (
+        <LoopingRiskMetrics
+          leverage={Number(looping.metrics.leverage ?? 0)}
+          ltv={Number(looping.metrics.ltv ?? 0)}
+          health_factor={Number(looping.metrics.health_factor ?? 0)}
+          debt_collateral={Number(looping.metrics.debt_collateral ?? 0)}
+          unit={"USDC"}
+        />
+      )}
 
       {/* Estimated LP Breakdown */}
       <section className="mt-6 rounded-xl border border-white/15 bg-white/[0.04] p-4 md:p-5">

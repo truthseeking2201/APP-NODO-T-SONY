@@ -1,6 +1,8 @@
 import { GradientSelect } from "@/components/ui/gradient-select";
 import { InputSearch } from "@/components/ui/input-search";
 import { LabelWithTooltip } from "@/components/ui/label-with-tooltip";
+import ApyTooltipContent from "@/components/apy/ApyTooltipContent";
+import type { ApyBreakdown } from "@/types/apy.types";
 import { TableRender } from "@/components/ui/table-render";
 import Web3Button from "@/components/ui/web3-button";
 import { ButtonGradient } from "@/components/ui/button-gradient";
@@ -174,6 +176,9 @@ export default function VaultList() {
 
       return {
         ...vault,
+        is_looping: Boolean((vault as any)?.metadata?.is_looping),
+        apy_breakdown: (vault as any)?.metadata?.apy_breakdown,
+        apyBreakdown: (vault as any)?.metadata?.apyBreakdown,
         exchange_name: exchange.name,
         exchange_image: exchange.image,
         exchange_code: exchange.code,
@@ -299,16 +304,31 @@ export default function VaultList() {
             hasIcon={false}
             label="APY"
             labelClassName="text-white/80 text-left text-[16px] underline underline-offset-8 decoration-dotted decoration-gray-600"
-            tooltipContent="Your real yearly return with hourly compounding, based on the average APR of the last 7 days. Updates every 1 hour."
+            tooltipContent="Net APY = Fees − Borrow − Rebalance"
           />
         ),
         dataIndex: "apy",
         classTitle: "text-white/80 text-left w-[100px]",
         keySort: "vault_apy",
         render: (value: any, record: any) => (
-          <span className="text-green-increase font-medium font-mono text-base break-all">
-            {record.vault_apy_show}
-          </span>
+          <div className="flex items-center gap-1">
+            <span className="text-green-increase font-medium font-mono text-base break-all">
+              {record.vault_apy_show}
+            </span>
+            {(record?.apyBreakdown || record?.apy_breakdown) && (
+              <LabelWithTooltip
+                hasIcon
+                label=""
+                tooltipContent={
+                  <ApyTooltipContent
+                    variant="listing"
+                    apy={(record.apyBreakdown || record.apy_breakdown) as ApyBreakdown}
+                  />
+                }
+                contentClassName="shadow-[0_2px_4px_rgba(255,255,255,0.25)] p-3 max-w-[300px]"
+              />
+            )}
+          </div>
         ),
       },
       {

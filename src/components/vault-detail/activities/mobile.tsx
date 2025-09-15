@@ -15,6 +15,7 @@ import TableMobile, {
 import {
   ADD_LIQUIDITY_TYPES,
   REMOVE_LIQUIDITY_TYPES,
+  ITEMS_PER_PAGE,
 } from "@/components/vault-detail/constant";
 import { renamingType } from "@/components/vault-detail/activities/utils";
 import ConditionRenderer from "@/components/shared/condition-renderer";
@@ -34,7 +35,7 @@ const MobileList = ({
       when={isFetched}
       fallback={
         <TableMobile>
-          {Array(5)
+          {Array(ITEMS_PER_PAGE)
             .fill(0)
             .map((_, i) => (
               <Fragment key={i}>

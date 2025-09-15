@@ -40,6 +40,22 @@ export const mockDepositVaults: DepositVaultConfig[] = [
       vault_config_id: "0xMOCK_CONFIG",
       exchange_id: 1,
       pool: "0xMOCK_POOL_ADDR",
+      is_looping: true,
+      apy_breakdown: { fees: 18.2, borrow: 4.0, rebalance: 1.3 },
+      apyBreakdown: {
+        baseApr24h: 0.015,
+        baseApr7d: 0.018,
+        nodoApr: 0.0065,
+        campaigns: [
+          { label: "OKX Boost", apr: 0.0442 },
+        ],
+        totalApr: 0.018 + 0.0065 + 0.0442,
+        totalApy: Math.pow(1 + (0.018 + 0.0065 + 0.0442) / 365, 365) - 1,
+        tvlUsd: 123456789,
+        lastUpdatedIso: new Date().toISOString(),
+        xpUsdRate: 1,
+      },
+      looping_metrics: { leverage: 1.6, ltv: 0.38, health_factor: 1.9, debt_collateral: 250000 },
     },
     pool: {
       pool_name: "NOVA/USDC Pool",
@@ -143,6 +159,22 @@ export const mockBasicDetails: Record<string, BasicVaultDetailsType> = {
         cetus: { config: "0xMOCK_EXEC_CT", module: "cetus_adapter", address: "0xMOCK" },
       },
       is_enable_dual_token: true,
+      is_looping: true,
+      apy_breakdown: { fees: 18.2, borrow: 4.0, rebalance: 1.3 },
+      apyBreakdown: {
+        baseApr24h: 0.015,
+        baseApr7d: 0.018,
+        nodoApr: 0.0065,
+        campaigns: [
+          { label: "OKX Boost", apr: 0.0442 },
+        ],
+        totalApr: 0.018 + 0.0065 + 0.0442,
+        totalApy: Math.pow(1 + (0.018 + 0.0065 + 0.0442) / 365, 365) - 1,
+        tvlUsd: 123456789,
+        lastUpdatedIso: new Date().toISOString(),
+        xpUsdRate: 1,
+      },
+      looping_metrics: { leverage: 1.6, ltv: 0.38, health_factor: 1.9, debt_collateral: 250000 },
     },
     collateral_price_feed_id: "0xMOCK_PRICE_FEED",
     change_24h: [],
@@ -212,6 +244,18 @@ export const mockUserHolding = {
     { token_symbol: "DEEP", token_name: "DEEP", amount: 100000, amount_in_usd: 100000, percent_change: 0 },
   ],
   user_vault_rewards: [],
+  // Looping risk metrics for LP+ vaults
+  is_looping: true,
+  looping_metrics: { leverage: 1.6, ltv: 0.38, health_factor: 1.9, debt_collateral: 250000 },
+};
+
+export const mockPnlBreakdown = {
+  fees: 1240.5,
+  il: -830.2,
+  rebalancing_cost: -120.0,
+  borrow_cost: -210.0,
+  net: 80.3,
+  unit: "USDC",
 };
 
 export const mockVaultActivitiesPage = {
@@ -238,6 +282,34 @@ export const mockVaultActivitiesPage = {
       created_at: new Date().toISOString(),
       hash: "0xMOCKREMOVE",
     },
+    {
+      id: "tx4",
+      action_type: "SUPPLY",
+      amount_in_usd: 10000,
+      created_at: new Date().toISOString(),
+      hash: "0xMOCKSUPPLY",
+    },
+    {
+      id: "tx5",
+      action_type: "BORROW",
+      amount_in_usd: 7000,
+      created_at: new Date().toISOString(),
+      hash: "0xMOCKBORROW",
+    },
+    {
+      id: "tx6",
+      action_type: "REPAY",
+      amount_in_usd: 5000,
+      created_at: new Date().toISOString(),
+      hash: "0xMOCKREPAY",
+    },
+    {
+      id: "tx7",
+      action_type: "UNWIND",
+      amount_in_usd: 8000,
+      created_at: new Date().toISOString(),
+      hash: "0xMOCKUNWIND",
+    },
   ],
 };
 
@@ -253,4 +325,3 @@ export const mockVaultAnalytics = {
     apy: 12 + Math.sin(i / 8),
   })),
 };
-

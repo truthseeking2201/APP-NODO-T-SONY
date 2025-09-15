@@ -1,6 +1,7 @@
 import { useBreakpoint } from "@/hooks/use-breakpoint";
 import { cn } from "@/lib/utils";
 import { VaultItemData } from "./vault-list";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const VaultItem = ({ item }: { item: VaultItemData }) => {
   const { windowWidth } = useBreakpoint();
@@ -23,8 +24,22 @@ export const VaultItem = ({ item }: { item: VaultItemData }) => {
           ))}
       </div>
       <div>
-        <div className="font-semibold text-white text-base leading-tight mb-1">
+        <div className="font-semibold text-white text-base leading-tight mb-1 flex items-center gap-2">
           {item.vault_name}
+          {item?.is_looping && (
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="px-1.5 py-0.5 rounded-md text-[10px] bg-[#0D314A] text-[#6AD6FF] border border-white/15">
+                    LP+
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="bg-black/90 rounded-xl shadow-lg p-3 w-[260px] border border-white/15 text-xs">
+                  Boosted liquidity with borrowing and reinvestment. AI manages LTV for safety.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
         <div className="flex gap-1 items-center text-base">
           <img

@@ -22,10 +22,14 @@ const URLS = {
     action_type?: string,
     vault_id?: string
   ) => {
-    const baseUrl = `/data-management/external/position-requests?page=${page}&limit=${limit}&vault_id=${vault_id}`;
-    return action_type && action_type !== ""
-      ? `${baseUrl}&action_type=${action_type}`
-      : baseUrl;
+    let baseUrl = `/data-management/external/position-requests?page=${page}&limit=${limit}`;
+    if (vault_id && vault_id !== "undefined") {
+      baseUrl += `&vault_id=${vault_id}`;
+    }
+    if (action_type && action_type !== "") {
+      baseUrl += `&action_type=${action_type}`;
+    }
+    return baseUrl;
   },
   depositVaults: (accountAddress?: string) => {
     let url = `/data-management/external/vaults/list`;

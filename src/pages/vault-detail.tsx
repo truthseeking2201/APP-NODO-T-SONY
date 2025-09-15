@@ -9,6 +9,8 @@ import StrategyExplanation from "@/components/vault-detail/sections/strategy-exp
 import VaultActivities from "@/components/vault-detail/sections/vault-activities";
 import VaultAnalytics from "@/components/vault-detail/sections/vault-analytics";
 import UserPositionSection from "@/components/vault-detail/sections/user-position-section";
+import PnlBreakdownSection from "@/components/vault-detail/sections/pnl-breakdown";
+import LoopingMetricsSection from "@/components/vault-detail/sections/looping-metrics";
 import VaultInfo from "@/components/vault-detail/sections/vault-info";
 // import YourHoldings from "@/components/vault-detail/sections/your-holdings";
 import YourHoldingsCard from "@/features/vault-detail/cards/YourHoldingsCard";
@@ -20,6 +22,8 @@ import { EXCHANGE_CODES_MAP } from "@/config/vault-config";
 import { useGetDepositVaults, useVaultBasicDetails } from "@/hooks";
 import { formatAmount } from "@/lib/utils";
 import { BasicVaultDetailsType } from "@/types/vault-config.types";
+import ApyTooltipContent from "@/components/apy/ApyTooltipContent";
+import type { ApyBreakdown } from "@/types/apy.types";
 import { useMemo } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import useBreakpoint from "@/hooks/use-breakpoint";
@@ -66,8 +70,16 @@ const VaultDetail = () => {
     return [
       {
         label: "APY",
-        tooltip:
-          "Your real yearly return with hourly compounding, based on the average APR of the last 7 days. Updates every 1 hour.",
+        tooltip: (
+          <ApyTooltipContent
+            variant="detail"
+            apy={
+              ((vaultDetails as any)?.apyBreakdown ||
+                (vaultDetails as any)?.metadata?.apyBreakdown ||
+                (vaultDetails as any)?.metadata?.apy_breakdown) as ApyBreakdown
+            }
+          />
+        ),
         value: !isLoadingVaultDetails
           ? formatAmount({
               amount: vaultDetails?.vault_apy,
@@ -174,6 +186,8 @@ const VaultDetail = () => {
             vault={vaultDetails}
           />
           <UserPositionSection />
+          <PnlBreakdownSection vault_id={vault_id as string} />
+          <LoopingMetricsSection vault_id={vault_id as string} />
           <VaultActivities isDetailLoading={isDetailLoading} vault_id={vault_id} />
           <StrategyExplanation vault={vaultDetails} isDetailLoading={isDetailLoading} />
           <VaultInfo vaultDetails={vaultDetails} isDetailLoading={isDetailLoading} />

@@ -15,6 +15,7 @@ export const ACTIVITIES_TABS = [
   { value: "SWAP", label: "Swap" },
   { value: "ADD_LIQUIDITY", label: "Add" },
   { value: "REMOVE_LIQUIDITY", label: "Remove" },
+  { value: "LOOPING", label: "Looping" },
 ];
 
 export const METHOD_DEPOSIT = {
@@ -26,7 +27,7 @@ export const METHOD_DEPOSIT_TABS = [
   { value: METHOD_DEPOSIT.SINGLE, label: "Single" },
 ];
 
-export const ITEMS_PER_PAGE = 5;
+export const ITEMS_PER_PAGE = 50;
 export const ADD_LIQUIDITY_TYPES = [
   "ADD_LIQUIDITY",
   "OPEN",
@@ -35,6 +36,7 @@ export const ADD_LIQUIDITY_TYPES = [
 ];
 export const REMOVE_LIQUIDITY_TYPES = ["REMOVE_LIQUIDITY", "CLOSE"];
 export const SWAP_TYPES = ["SWAP"];
+export const LOOPING_TYPES = ["SUPPLY", "BORROW", "REPAY", "UNWIND"];
 
 // Mock datasets for UserPosition (Profit Zone) chart
 export const mockDataLiveChart = [

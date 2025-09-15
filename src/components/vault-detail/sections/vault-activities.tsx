@@ -13,6 +13,7 @@ import {
   ADD_LIQUIDITY_TYPES,
   REMOVE_LIQUIDITY_TYPES,
   SWAP_TYPES,
+  LOOPING_TYPES,
 } from "@/components/vault-detail/constant";
 import MobileList from "@/components/vault-detail/activities/mobile";
 import DesktopTable from "@/components/vault-detail/activities/desktop";
@@ -90,6 +91,9 @@ const VaultActivities = ({
     }
     if (filter.some((type) => REMOVE_LIQUIDITY_TYPES.includes(type))) {
       return "REMOVE_LIQUIDITY";
+    }
+    if (filter.some((type) => LOOPING_TYPES.includes(type))) {
+      return "LOOPING";
     }
     return "";
   }, []);

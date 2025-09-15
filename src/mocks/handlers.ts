@@ -11,6 +11,7 @@ import {
   mockVaultActivitiesPage,
   mockVaultAnalytics,
   mockSwapDepositInfo,
+  mockPnlBreakdown,
 } from "./fixtures/vaults";
 import { mockWalletDetail, mockAffiliateDashboard } from "./fixtures/referrals";
 
@@ -78,7 +79,14 @@ export const handlers = [
       const limit = parseInt(url.searchParams.get("limit") ?? "25", 10);
   
       let rows = mockActivities.filter((a) => a.vault_id === vaultId);
-      if (action) rows = rows.filter((a) => a.action_type === (action as any));
+      if (action) {
+        if (action === "LOOPING") {
+          const loopSet = new Set(["SUPPLY", "BORROW", "REPAY", "UNWIND"]);
+          rows = rows.filter((a) => loopSet.has(a.action_type as any));
+        } else {
+          rows = rows.filter((a) => a.action_type === (action as any));
+        }
+      }
   
       const total = rows.length;
       const start = (page - 1) * limit;
@@ -93,6 +101,8 @@ export const handlers = [
         createdAt: r.created_at,
         hash: r.hash,
         status: r.status,
+        token_in: r.token_in,
+        token_out: r.token_out,
       }));
   
       return ok({ page, limit, total, items });
@@ -103,6 +113,7 @@ export const handlers = [
 
   // ---- Analytics
   http.get("/data-management/external/vaults/:vaultId/histogram", async () => ok(mockVaultAnalytics)),
+  http.get("/data-management/external/vaults/:vaultId/pnl-breakdown", async () => ok(mockPnlBreakdown)),
 
   // ---- Latest / execution withdrawals
   http.get("/data-management/external/withdrawals/latest", async () => ok({ status: "success" })),
