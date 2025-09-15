@@ -173,16 +173,19 @@ const VaultDetail = () => {
     </header>
   );
 
+  const TabsBar = (
+    <UnderlineTabs
+      value={tab}
+      onValueChange={(v) => setTab(v as any)}
+      items={[
+        { value: "overview", label: "Overview" },
+        { value: "holdings", label: "Your Holdings" },
+      ]}
+    />
+  );
+
   const LeftColumn = (
     <div className="space-y-6">
-      <UnderlineTabs
-        value={tab}
-        onValueChange={(v) => setTab(v as any)}
-        items={[
-          { value: "overview", label: "Overview" },
-          { value: "holdings", label: "Your Holdings" },
-        ]}
-      />
 
       {tab === "overview" && (
         <div className="space-y-6">
@@ -213,7 +216,7 @@ const VaultDetail = () => {
 
   return (
     <PageContainer backgroundImage={DetailsBackground} className="vault-page max-md:py-0 py-0 pb-[160px]">
-      <StickyAsideLayout header={Header} left={LeftColumn} right={RightColumn} topOffsetPx={0} />
+      <StickyAsideLayout header={Header} subheader={TabsBar} left={LeftColumn} right={RightColumn} topOffsetPx={36} />
     </PageContainer>
   );
 };

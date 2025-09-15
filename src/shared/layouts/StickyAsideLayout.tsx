@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 
 type Props = {
   header?: ReactNode;
+  subheader?: ReactNode;
   left: ReactNode;
   right: ReactNode;
   topOffsetPx?: number;
@@ -9,6 +10,7 @@ type Props = {
 
 export default function StickyAsideLayout({
   header,
+  subheader,
   left,
   right,
   topOffsetPx = 96,
@@ -16,9 +18,12 @@ export default function StickyAsideLayout({
   return (
     <div className="min-h-screen w-full">
       {header}
+      {subheader && (
+        <div className="mx-auto w-full max-w-[1440px] px-4 lg:px-6 mb-2">{subheader}</div>
+      )}
       <div className="mx-auto w-full max-w-[1440px] px-4 lg:px-6">
         {/* Grid container: two columns on xl+, single column below */}
-        <div className="mt-3 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_400px] 2xl:grid-cols-[1fr_440px] vault-sticky-ancestor">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_400px] 2xl:grid-cols-[1fr_440px] vault-sticky-ancestor">
           {/* LEFT — scrollable column on xl+ */}
           <div className="order-2 xl:order-1 pr-0 xl:pr-2">
             {left}
@@ -26,10 +31,7 @@ export default function StickyAsideLayout({
 
           {/* RIGHT — sticky aside (all sizes), with internal scroll cap on xl+ */}
           <aside
-            className="
-              order-1 xl:order-2
-              lg:sticky lg:self-start
-            "
+            className="order-1 xl:order-2 lg:sticky lg:self-start"
             style={{ top: topOffsetPx }}
           >
             <div
