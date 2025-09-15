@@ -62,20 +62,31 @@ export function ApyTooltipContent({ apy, variant }: Props) {
 
   return (
     <div className="space-y-2">
-      <div className="text-white font-medium">Total APY (daily compounding)</div>
+      <div className="text-[13px] font-semibold text-white">Total APY (daily compounding)</div>
 
-      {variant === "detail" && (
-        <div className="text-white/60 text-xs">Total APR = Base 7d + NODO + Campaign(s)</div>
-      )}
+      <div className="text-white/60 text-[11px]">Total APR = Base 7d + NODO + Campaign(s)</div>
 
       {showDonut && <Donut totalApr={totalApr} slices={donutSlices} />}
 
-      <ul className="text-sm text-white/90 space-y-1">
-        <Row label="Base APR (7-day rolling)" value={formatPct(apy?.baseApr7d)} />
-        <Row label="NODO Incentives APR" value={formatPct(apy?.nodoApr)} />
+      <ul className="text-white/90 space-y-1">
+        <Row
+          label="Base APR (7-day rolling)"
+          value={formatPct(apy?.baseApr7d)}
+          hint="Sum of fees & rewards over last 7 days (active snapshots), divided by average TVL, annualized ×365."
+        />
+        <Row
+          label="NODO Incentives APR"
+          value={formatPct(apy?.nodoApr)}
+          hint="NODO’s budget prorated by current TVL and annualized (USD‑equivalent)."
+        />
 
         {shownCampaigns.map((c, i) => (
-          <Row key={i} label={c.label} value={formatPct(c.apr)} />
+          <Row
+            key={i}
+            label={c.label}
+            value={formatPct(c.apr)}
+            hint="Fixed APR configured per campaign; may change by terms."
+          />
         ))}
         {hiddenCount > 0 && (
           <li className="text-white/60 text-xs">+ {hiddenCount} more campaign APRs</li>
@@ -87,11 +98,7 @@ export function ApyTooltipContent({ apy, variant }: Props) {
       </ul>
 
       <div className="text-[11px] text-white/50 pt-1">
-        {variant === "detail" ? (
-          <>Base 24h: {formatPct(apy?.baseApr24h)} · XP converted to USD-equivalent for APR · Updated {updated}</>
-        ) : (
-          <>Base 24h: {formatPct(apy?.baseApr24h)} · Values may vary with TVL · Updated {updated}</>
-        )}
+        <>Base 24h: {formatPct(apy?.baseApr24h)} · Updated {updated} · Values may vary with TVL/activity</>
       </div>
     </div>
   );
@@ -102,16 +109,32 @@ function Row({
   value,
   bold,
   mutedLabel,
+  hint,
 }: {
   label: string;
   value: string;
   bold?: boolean;
   mutedLabel?: boolean;
+  hint?: string;
 }) {
   return (
-    <li className="flex justify-between gap-4">
-      <span className={mutedLabel ? "text-white/80" : undefined}>{label}</span>
-      <span className={`[font-variant-numeric:tabular-nums] text-right ${bold ? "font-semibold" : "font-medium"}`}>
+    <li className="flex items-center gap-2">
+      <span className={`text-sm ${mutedLabel ? "text-white/80" : "text-white/90"}`}>{label}</span>
+      {hint && (
+        <span
+          className="ml-1 inline-flex items-center justify-center rounded-full border border-white/20 text-white/70 text-[10px] w-4 h-4"
+          aria-label="How this APR is calculated"
+          title={hint}
+        >
+          i
+        </span>
+      )}
+      <span className="flex-1 border-b border-dotted border-white/15 opacity-60 translate-y-[1px]" />
+      <span
+        className={`text-sm whitespace-nowrap [font-variant-numeric:tabular-nums] text-right font-mono ${
+          bold ? "font-semibold" : "font-medium"
+        }`}
+      >
         {value}
       </span>
     </li>
@@ -125,8 +148,8 @@ function Donut({
   totalApr: number;
   slices: Array<{ label: string; apr: number; color: string }>;
 }) {
-  const size = 88;
-  const stroke = 10;
+  const size = 96;
+  const stroke = 8;
   const r = (size - stroke) / 2;
   const cx = size / 2;
   const cy = size / 2;
@@ -163,12 +186,17 @@ function Donut({
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="shrink-0">
         <circle r={r} cx={cx} cy={cy} fill="transparent" stroke="#1F2937" strokeOpacity={0.4} strokeWidth={stroke} />
         {arcs}
-        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" className="fill-white text-[11px] font-semibold">
+        <text x="50%" y="45%" dominantBaseline="middle" textAnchor="middle" className="fill-white/60 text-[10px]">
+          TOTAL APR
+        </text>
+        <text x="50%" y="60%" dominantBaseline="middle" textAnchor="middle" className="fill-white text-[15px] font-semibold">
           {centerText}
         </text>
       </svg>
       <div className="text-xs text-white/80 space-y-1">
-        {slices
+        {[...slices]
+          .filter((s) => s.apr > 0)
+          .sort((a, b) => b.apr - a.apr)
           .filter((s) => s.apr > 0)
           .slice(0, 5)
           .map((s, i) => {
@@ -177,7 +205,7 @@ function Donut({
               <div key={i} className="flex items-center gap-2">
                 <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: s.color }} />
                 <span className="flex-1">{s.label}</span>
-                <span className="[font-variant-numeric:tabular-nums] text-white/90">{share.toFixed(1)}%</span>
+                <span className="[font-variant-numeric:tabular-nums] font-mono text-white/90">{share.toFixed(1)}%</span>
               </div>
             );
           })}

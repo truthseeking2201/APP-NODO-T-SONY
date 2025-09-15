@@ -1,4 +1,7 @@
 import { RowItem } from "@/components/ui/row-item";
+import { LabelWithTooltip } from "@/components/ui/label-with-tooltip";
+import ApyTooltipContent from "@/components/apy/ApyTooltipContent";
+import type { ApyBreakdown } from "@/types/apy.types";
 import { VaultItemData } from "./vault-list";
 import { cn } from "@/lib/utils";
 import Web3Button from "@/components/ui/web3-button";
@@ -85,7 +88,22 @@ const VaultItemMobile = ({
         classNameValue={cn(classValue, "text-green-increase")}
         label="APY"
       >
-        {item.vault_apy_show}
+        <div className="flex items-center gap-1">
+          <span>{item.vault_apy_show}</span>
+          {(item as any)?.apyBreakdown && (
+            <LabelWithTooltip
+              hasIcon
+              label=""
+              tooltipContent={
+                <ApyTooltipContent
+                  variant="listing"
+                  apy={(item as any).apyBreakdown as ApyBreakdown}
+                />
+              }
+              contentClassName="shadow-[0_2px_4px_rgba(255,255,255,0.25)] p-3 max-w-[360px]"
+            />
+          )}
+        </div>
       </RowItem>
 
       <RowItem

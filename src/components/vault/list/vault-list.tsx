@@ -329,7 +329,7 @@ export default function VaultList() {
                     apy={(record.apyBreakdown || record.apy_breakdown) as ApyBreakdown}
                   />
                 }
-                contentClassName="shadow-[0_2px_4px_rgba(255,255,255,0.25)] p-3 max-w-[300px]"
+                contentClassName="shadow-[0_2px_4px_rgba(255,255,255,0.25)] p-3 max-w-[360px]"
               />
             )}
           </div>
