@@ -18,6 +18,7 @@ import StickyAsideLayout from "@/shared/layouts/StickyAsideLayout";
 import ManageLiquidityCard from "@/features/vaults/components/ManageLiquidityCard";
 import { useVaultTab } from "@/features/vault-detail/useTab";
 import { UnderlineTabs } from "@/components/ui/UnderlineTabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EXCHANGE_CODES_MAP } from "@/config/vault-config";
 import { useGetDepositVaults, useVaultBasicDetails } from "@/hooks";
 import { formatAmount } from "@/lib/utils";
@@ -173,15 +174,33 @@ const VaultDetail = () => {
     </header>
   );
 
-  const TabsBar = (
-    <UnderlineTabs
-      value={tab}
-      onValueChange={(v) => setTab(v as any)}
-      items={[
-        { value: "overview", label: "Overview" },
-        { value: "holdings", label: "Your Holdings" },
-      ]}
-    />
+  const TabsAndUnitRow = (
+    <div className="flex items-center justify-between">
+      <UnderlineTabs
+        value={tab}
+        onValueChange={(v) => setTab(v as any)}
+        items={[
+          { value: "overview", label: "Overview" },
+          { value: "holdings", label: "Your Holdings" },
+        ]}
+      />
+      <div className="flex items-center gap-2">
+        <span className="text-white/60 text-xs">View by</span>
+        <Tabs
+          value={viewUnit}
+          onValueChange={(v) => {
+            const u = (v === 'SUI' ? 'SUI' : '$') as '$' | 'SUI';
+            setUnit(u);
+            if (u === 'SUI') ensureSuiPrice();
+          }}
+        >
+          <TabsList className="p-1 flex gap-1">
+            <TabsTrigger value="$">$</TabsTrigger>
+            <TabsTrigger value="SUI">SUI</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    </div>
   );
 
   const LeftColumn = (
@@ -216,7 +235,7 @@ const VaultDetail = () => {
 
   return (
     <PageContainer backgroundImage={DetailsBackground} className="vault-page max-md:py-0 py-0 pb-[160px]">
-      <StickyAsideLayout header={Header} subheader={TabsBar} left={LeftColumn} right={RightColumn} topOffsetPx={36} />
+      <StickyAsideLayout header={Header} subheader={TabsAndUnitRow} left={LeftColumn} right={RightColumn} topOffsetPx={36} />
     </PageContainer>
   );
 };
