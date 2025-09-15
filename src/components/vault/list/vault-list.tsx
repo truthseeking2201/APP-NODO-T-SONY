@@ -329,13 +329,16 @@ export default function VaultList() {
         keySort: "vault_apy",
         render: (value: any, record: any) => (
           <div className="flex items-center gap-1">
-            <span className="text-green-increase font-medium font-mono text-base break-all">
-              {record.vault_apy_show}
-            </span>
-            {(record?.apyBreakdown || record?.apy_breakdown) && (
+            {(record?.apyBreakdown || record?.apy_breakdown) ? (
               <LabelWithTooltip
-                hasIcon
-                label=""
+                type="underline"
+                hasIcon={false}
+                label={
+                  <span className="text-green-increase font-medium font-mono text-base break-all">
+                    {record.vault_apy_show}
+                  </span>
+                }
+                labelClassName="text-green-increase font-medium font-mono text-base break-all"
                 tooltipContent={
                   <ApyTooltipContent
                     variant="detail"
@@ -344,6 +347,10 @@ export default function VaultList() {
                 }
                 contentClassName="shadow-[0_2px_4px_rgba(255,255,255,0.25)] p-3 max-w-[360px]"
               />
+            ) : (
+              <span className="text-green-increase font-medium font-mono text-base break-all">
+                {record.vault_apy_show}
+              </span>
             )}
           </div>
         ),

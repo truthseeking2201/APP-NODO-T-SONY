@@ -28,11 +28,13 @@ export const formatAmount = ({
   minimumDisplay?: number;
   sign?: string;
 }) => {
+  const n = new BigNumber(amount);
+  const num = Number.isFinite(n.toNumber()) ? n.toNumber() : 0;
   let formatted = new Intl.NumberFormat(undefined, {
     style: "decimal",
     minimumFractionDigits: precision,
     maximumFractionDigits: precision,
-  }).format(new BigNumber(amount).toNumber());
+  }).format(num);
 
   if (stripZero) {
     formatted = formatted.replace(/\.?0+$/, "");

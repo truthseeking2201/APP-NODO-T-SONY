@@ -19,7 +19,7 @@ export default function StickyAsideLayout({
     <div className="min-h-screen w-full">
       {header}
       {subheader && (
-        <div className="mx-auto w-full max-w-[1440px] px-4 lg:px-6 mt-6 mb-6">{subheader}</div>
+        <div className="mx-auto w-full max-w-[1440px] px-4 lg:px-6 mt-6">{subheader}</div>
       )}
       <div className="mx-auto w-full max-w-[1440px] px-4 lg:px-6">
         {/* Grid container: two columns on xl+, single column below */}

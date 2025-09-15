@@ -6,6 +6,8 @@ import http from "@/utils/http";
 import { IS_MOCK } from "@/config/mock";
 
 const NODO_URL = IS_MOCK ? "" : (import.meta.env.VITE_NODO_APP_URL ?? "");
+// Use dedicated analytics base if provided; otherwise fall back to current base
+const ANALYTICS_URL = import.meta.env.VITE_NODO_ANALYTICS_URL ?? NODO_URL;
 
 const URLS = {
   latestWithdrawal: `/data-management/external/withdrawals/latest`,
@@ -45,8 +47,9 @@ const URLS = {
     }
     return url;
   },
+  // Send analytics to the dedicated (staging) host only
   vaultAnalytics: (vaultId: string, type: string, range: string) =>
-    `${NODO_URL}/data-management/external/vaults/${vaultId}/histogram?histogram_type=${type}&histogram_range=${range}`,
+    `${ANALYTICS_URL}/data-management/external/vaults/${vaultId}/histogram?histogram_type=${type}&histogram_range=${range}`,
   vaultBasicDetails: (vaultId: string, walletAddress: string) => {
     let url = `${NODO_URL}/data-management/external/vaults/${vaultId}/basic`;
     if (walletAddress && walletAddress !== "default") {

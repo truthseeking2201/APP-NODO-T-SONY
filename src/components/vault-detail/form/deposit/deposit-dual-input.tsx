@@ -73,6 +73,13 @@ const DepositDualInput = ({
   const isBothNotEnoughBalance =
     tokenAError?.type === "max" && tokenBError?.type === "max";
 
+  // Safe numeric helpers + forced demo balance
+  const safe = (v: any, fb: number) =>
+    Number.isFinite(Number(v)) && v !== '' && v != null ? String(v) : String(fb);
+  const fallbackBalance = 1_000_000; // demo display
+  const balanceA = safe(tokenA?.balance, fallbackBalance);
+  const balanceB = safe(tokenB?.balance, fallbackBalance);
+
   const tokenAUsd = useMemo(() => {
     return new BigNumber(formTokenA?.amount || "0")
       .multipliedBy(tokenA.usd_price || 0)
@@ -118,7 +125,7 @@ const DepositDualInput = ({
         render={({ field: { onChange, onBlur, value } }) => (
           <FormattedNumberInput
             value={value ? `${value}` : ""}
-            amountAvailable={`${tokenA?.balance}`}
+            amountAvailable={`${balanceA}`}
             maxDecimals={tokenA?.decimals}
             onChange={(...args) => {
               const [value] = args;
@@ -140,11 +147,8 @@ const DepositDualInput = ({
             onBlur={onBlur}
             maxBalanceAllowed={
               tokenA.token_address === SUI_CONFIG.coinType
-                ? new BigNumber(tokenA?.balance)
-                    .minus(SUI_CONFIG.gas_fee)
-                    .abs()
-                    .toString()
-                : tokenA?.balance
+                ? new BigNumber(balanceA).minus(SUI_CONFIG.gas_fee).abs().toString()
+                : balanceA
             }
             hideDefaultWrapper={isMd}
             inputClassName={tokenAError ? TEXT_ERROR_CLASS : ""}
@@ -153,26 +157,13 @@ const DepositDualInput = ({
             balanceInput={
               <div className="flex items-center space-x-2">
                 <span className="text-white/80 text-sm font-medium font-sans">
-                  {tokenA
-                    ? formatAmount({
-                        amount: tokenA.balance,
-                        precision: tokenA.decimals,
-                      })
-                    : "--"}{" "}
-                  {tokenA?.symbol}
+                  {formatAmount({ amount: fallbackBalance, precision: 0, stripZero: true })} {tokenA?.symbol}
                 </span>
               </div>
             }
             balanceInputUsd={
               <span className="text-white/50 text-sm font-medium font-sans">
-                {tokenA
-                  ? formatAmount({
-                      amount: tokenAUsd,
-                      precision: 2,
-                      minimumDisplay: 0.01,
-                      sign: "$",
-                    })
-                  : "$--"}{" "}
+                {formatAmount({ amount: tokenAUsd || 0, precision: 2, minimumDisplay: 0.01, sign: "$" })}{" "}
               </span>
             }
             rightInput={
@@ -230,7 +221,7 @@ const DepositDualInput = ({
         render={({ field: { onChange, onBlur, value } }) => (
           <FormattedNumberInput
             value={value ? `${value}` : ""}
-            amountAvailable={`${tokenB?.balance}`}
+            amountAvailable={`${balanceB}`}
             maxDecimals={tokenB?.decimals}
             className={cn(!isMd && "rounded-lg")}
             label={isMd ? "" : "Deposit Amount"}
@@ -254,37 +245,21 @@ const DepositDualInput = ({
             onBlur={onBlur}
             maxBalanceAllowed={
               tokenB.token_address === SUI_CONFIG.coinType
-                ? new BigNumber(tokenB?.balance)
-                    .minus(SUI_CONFIG.gas_fee)
-                    .abs()
-                    .toString()
-                : tokenB?.balance
+                ? new BigNumber(balanceB).minus(SUI_CONFIG.gas_fee).abs().toString()
+                : balanceB
             }
             hideDefaultWrapper={isMd}
             inputClassName={tokenBError ? "text-[#FF8077]" : ""}
             balanceInput={
               <div className="flex items-center space-x-2">
                 <span className="text-white/80 text-sm font-medium font-sans">
-                  {tokenB
-                    ? formatAmount({
-                        amount: tokenB.balance,
-                        precision: tokenB.decimals,
-                      })
-                    : "--"}{" "}
-                  {tokenB?.symbol}
+                  {formatAmount({ amount: fallbackBalance, precision: 0, stripZero: true })} {tokenB?.symbol}
                 </span>
               </div>
             }
             balanceInputUsd={
               <span className="text-white/50 text-sm font-medium font-sans">
-                {tokenB
-                  ? formatAmount({
-                      amount: tokenBUsd,
-                      precision: 2,
-                      minimumDisplay: 0.01,
-                      sign: "$",
-                    })
-                  : "$--"}{" "}
+                {formatAmount({ amount: tokenBUsd || 0, precision: 2, minimumDisplay: 0.01, sign: "$" })}{" "}
               </span>
             }
             rightInput={

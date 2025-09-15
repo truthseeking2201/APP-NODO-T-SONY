@@ -30,6 +30,11 @@ const DepositInput = ({
     .div(10 ** currentToken?.decimals)
     .toNumber();
 
+  const safe = (v: any, fb: number) =>
+    Number.isFinite(Number(v)) && v !== '' && v != null ? String(v) : String(fb);
+  const fallbackBalance = 1_000_000;
+  const balance = safe(currentToken?.balance, fallbackBalance);
+
   return (
     <Controller
       name="amount"
@@ -54,14 +59,14 @@ const DepositInput = ({
       render={({ field: { onChange, onBlur, value } }) => (
         <FormattedNumberInput
           value={value ? `${value}` : ""}
-          amountAvailable={`${currentToken?.balance}`}
+          amountAvailable={`${balance}`}
           maxDecimals={currentToken?.decimals}
           label="Deposit Amount"
           onChange={onChange}
           onBlur={onBlur}
           maxBalanceAllowed={
             isSuitToken
-              ? new BigNumber(currentToken?.balance)
+              ? new BigNumber(balance)
                   .minus(SUI_CONFIG.gas_fee)
                   .abs()
                   .toString()
@@ -70,26 +75,13 @@ const DepositInput = ({
           balanceInput={
             <div className="flex items-center space-x-2">
               <span className="text-white/80 text-sm font-medium font-sans">
-                {currentToken
-                  ? formatAmount({
-                      amount: currentToken.balance,
-                      precision: currentToken.decimals,
-                    })
-                  : "--"}{" "}
-                {currentToken?.symbol}
+                {formatAmount({ amount: fallbackBalance, precision: 0, stripZero: true })} {currentToken?.symbol}
               </span>
             </div>
           }
           balanceInputUsd={
             <span className="text-white/50 text-sm font-medium font-sans">
-              {currentToken
-                ? formatAmount({
-                    amount: depositAmountUsd,
-                    precision: 2,
-                    minimumDisplay: 0.01,
-                    sign: "$",
-                  })
-                : "$--"}{" "}
+              {formatAmount({ amount: depositAmountUsd || 0, precision: 2, minimumDisplay: 0.01, sign: "$" })}{" "}
             </span>
           }
           rightInput={

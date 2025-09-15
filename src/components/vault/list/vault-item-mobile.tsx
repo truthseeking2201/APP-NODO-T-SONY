@@ -89,11 +89,16 @@ const VaultItemMobile = ({
         label="APY"
       >
         <div className="flex items-center gap-1">
-          <span>{item.vault_apy_show}</span>
-          {(item as any)?.apyBreakdown && (
+          {(item as any)?.apyBreakdown ? (
             <LabelWithTooltip
-              hasIcon
-              label=""
+              type="underline"
+              hasIcon={false}
+              label={
+                <span className="text-green-increase font-medium font-mono text-base break-all">
+                  {item.vault_apy_show}
+                </span>
+              }
+              labelClassName="text-green-increase font-medium font-mono text-base break-all"
               tooltipContent={
                 <ApyTooltipContent
                   variant="detail"
@@ -102,6 +107,10 @@ const VaultItemMobile = ({
               }
               contentClassName="shadow-[0_2px_4px_rgba(255,255,255,0.25)] p-3 max-w-[360px]"
             />
+          ) : (
+            <span className="text-green-increase font-medium font-mono text-base break-all">
+              {item.vault_apy_show}
+            </span>
           )}
         </div>
       </RowItem>
