@@ -26,68 +26,164 @@ function timeAgo(iso?: string) {
 }
 
 export function ApyTooltipContent({ apy, variant }: Props) {
-  const campaigns = apy?.campaigns ?? [];
-  const shownCampaigns = campaigns.slice(0, 3);
-  const more = Math.max(0, campaigns.length - shownCampaigns.length);
+  const campaigns = (apy?.campaigns ?? []).map((c) => ({
+    label: c.label?.includes("OKX") ? c.label.replace(/Boost/i, "Campaign APR") : c.label,
+    apr: Number.isFinite(c.apr as any) ? c.apr : 0,
+  }));
   const updated = timeAgo(apy?.lastUpdatedIso);
+
+  const clampZero = (n?: number | null) => (n == null || Number.isNaN(n) ? 0 : n);
+  const base = clampZero(apy?.baseApr7d);
+  const nodo = clampZero(apy?.nodoApr);
+  const totalApr = clampZero(apy?.totalApr);
+
+  // Listing shows up to 2 campaigns; Detail also shows up to 2 in text rows
+  const maxLines = 2;
+  const shownCampaigns = campaigns.slice(0, maxLines);
+  const hiddenCount = Math.max(0, campaigns.length - shownCampaigns.length);
+
+  // Donut data (detail only)
+  const donutSlices = [
+    { label: "Base 7d", apr: base, color: "#34D399" }, // emerald-400
+    { label: "NODO", apr: nodo, color: "#38BDF8" }, // sky-400
+  ];
+  if (variant === "detail") {
+    if (campaigns.length <= 3) {
+      campaigns.forEach((c, i) =>
+        donutSlices.push({ label: c.label, apr: c.apr, color: ["#A78BFA", "#F472B6", "#F59E0B"][i % 3] })
+      );
+    } else {
+      const sum = campaigns.reduce((a, b) => a + (b.apr || 0), 0);
+      donutSlices.push({ label: `Campaigns (${campaigns.length})`, apr: sum, color: "#A78BFA" });
+    }
+  }
+
+  const showDonut = variant === "detail" && totalApr > 0.0000001 && donutSlices.some((s) => s.apr > 0);
 
   return (
     <div className="space-y-2">
       <div className="text-white font-medium">Total APY (daily compounding)</div>
 
       {variant === "detail" && (
-        <div className="text-white/60 text-xs">
-          Total APR = Base 7d + NODO + Campaign(s)
-        </div>
+        <div className="text-white/60 text-xs">Total APR = Base 7d + NODO + Campaign(s)</div>
       )}
 
+      {showDonut && <Donut totalApr={totalApr} slices={donutSlices} />}
+
       <ul className="text-sm text-white/90 space-y-1">
-        <li className="flex justify-between">
-          <span>Base APR (7-day rolling)</span>
-          <span className="font-medium">{formatPct(apy?.baseApr7d)}</span>
-        </li>
-        <li className="flex justify-between">
-          <span>NODO Incentives APR</span>
-          <span className="font-medium">{formatPct(apy?.nodoApr)}</span>
-        </li>
+        <Row label="Base APR (7-day rolling)" value={formatPct(apy?.baseApr7d)} />
+        <Row label="NODO Incentives APR" value={formatPct(apy?.nodoApr)} />
 
         {shownCampaigns.map((c, i) => (
-          <li key={i} className="flex justify-between">
-            <span>{c.label}</span>
-            <span className="font-medium">{formatPct(c.apr)}</span>
-          </li>
+          <Row key={i} label={c.label} value={formatPct(c.apr)} />
         ))}
-
-        {more > 0 && (
-          <li className="text-white/60 text-xs">+ {more} more campaign APRs</li>
+        {hiddenCount > 0 && (
+          <li className="text-white/60 text-xs">+ {hiddenCount} more campaign APRs</li>
         )}
 
         <li className="h-px bg-white/10 my-2" />
-
-        <li className="flex justify-between">
-          <span className="font-semibold">Total APR</span>
-          <span className="font-semibold">{formatPct(apy?.totalApr)}</span>
-        </li>
-        <li className="flex justify-between">
-          <span className="text-white/80">APY shown</span>
-          <span className="font-semibold">{formatPct(apy?.totalApy)}</span>
-        </li>
+        <Row label="Total APR" value={formatPct(apy?.totalApr)} bold />
+        <Row label="APY shown" value={formatPct(apy?.totalApy)} bold mutedLabel />
       </ul>
 
       <div className="text-[11px] text-white/50 pt-1">
         {variant === "detail" ? (
-          <>
-            Base 24h: {formatPct(apy?.baseApr24h)} · XP converted to USD-equivalent for APR · Updated {updated}
-          </>
+          <>Base 24h: {formatPct(apy?.baseApr24h)} · XP converted to USD-equivalent for APR · Updated {updated}</>
         ) : (
-          <>
-            Base 24h: {formatPct(apy?.baseApr24h)} · Values may vary with TVL · Updated {updated}
-          </>
+          <>Base 24h: {formatPct(apy?.baseApr24h)} · Values may vary with TVL · Updated {updated}</>
         )}
       </div>
     </div>
   );
 }
 
-export default ApyTooltipContent;
+function Row({
+  label,
+  value,
+  bold,
+  mutedLabel,
+}: {
+  label: string;
+  value: string;
+  bold?: boolean;
+  mutedLabel?: boolean;
+}) {
+  return (
+    <li className="flex justify-between gap-4">
+      <span className={mutedLabel ? "text-white/80" : undefined}>{label}</span>
+      <span className={`[font-variant-numeric:tabular-nums] text-right ${bold ? "font-semibold" : "font-medium"}`}>
+        {value}
+      </span>
+    </li>
+  );
+}
 
+function Donut({
+  totalApr,
+  slices,
+}: {
+  totalApr: number;
+  slices: Array<{ label: string; apr: number; color: string }>;
+}) {
+  const size = 88;
+  const stroke = 10;
+  const r = (size - stroke) / 2;
+  const cx = size / 2;
+  const cy = size / 2;
+  const C = 2 * Math.PI * r;
+  const total = slices.reduce((a, b) => a + (b.apr || 0), 0) || 1;
+
+  let offset = 0;
+  const arcs = slices
+    .filter((s) => s.apr > 0)
+    .map((s, i) => {
+      const len = (s.apr / total) * C;
+      const arc = (
+        <circle
+          key={i}
+          r={r}
+          cx={cx}
+          cy={cy}
+          fill="transparent"
+          stroke={s.color}
+          strokeWidth={stroke}
+          strokeDasharray={`${len} ${C - len}`}
+          strokeDashoffset={-offset}
+          strokeLinecap="butt"
+        />
+      );
+      offset += len;
+      return arc;
+    });
+
+  const centerText = formatPct(totalApr);
+
+  return (
+    <div className="flex items-center gap-3">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="shrink-0">
+        <circle r={r} cx={cx} cy={cy} fill="transparent" stroke="#1F2937" strokeOpacity={0.4} strokeWidth={stroke} />
+        {arcs}
+        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" className="fill-white text-[11px] font-semibold">
+          {centerText}
+        </text>
+      </svg>
+      <div className="text-xs text-white/80 space-y-1">
+        {slices
+          .filter((s) => s.apr > 0)
+          .slice(0, 5)
+          .map((s, i) => {
+            const share = totalApr > 0 ? (s.apr / totalApr) * 100 : 0;
+            return (
+              <div key={i} className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: s.color }} />
+                <span className="flex-1">{s.label}</span>
+                <span className="[font-variant-numeric:tabular-nums] text-white/90">{share.toFixed(1)}%</span>
+              </div>
+            );
+          })}
+      </div>
+    </div>
+  );
+}
+
+export default ApyTooltipContent;

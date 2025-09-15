@@ -67,6 +67,8 @@ const VaultDetail = () => {
   };
 
   const vaultInfo = useMemo(() => {
+    const apyBreakdown = (vaultDetails as any)?.apyBreakdown || (vaultDetails as any)?.metadata?.apyBreakdown;
+    const apyPct = typeof apyBreakdown?.totalApy === "number" ? apyBreakdown.totalApy * 100 : Number(vaultDetails?.vault_apy);
     return [
       {
         label: "APY",
@@ -80,11 +82,10 @@ const VaultDetail = () => {
             }
           />
         ),
-        value: !isLoadingVaultDetails
-          ? formatAmount({
-              amount: vaultDetails?.vault_apy,
-            })
-          : "--",
+        value:
+          !isLoadingVaultDetails && apyPct != null && !Number.isNaN(apyPct)
+            ? formatAmount({ amount: Math.max(0, apyPct), precision: 2, stripZero: false })
+            : "--",
         suffix: "%",
       },
       {

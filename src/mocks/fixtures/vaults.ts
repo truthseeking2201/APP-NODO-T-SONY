@@ -47,7 +47,7 @@ export const mockDepositVaults: DepositVaultConfig[] = [
         baseApr7d: 0.018,
         nodoApr: 0.0065,
         campaigns: [
-          { label: "OKX Boost", apr: 0.0442 },
+          { label: "OKX Campaign APR", apr: 0.0442 },
         ],
         totalApr: 0.018 + 0.0065 + 0.0442,
         totalApy: Math.pow(1 + (0.018 + 0.0065 + 0.0442) / 365, 365) - 1,
@@ -166,7 +166,7 @@ export const mockBasicDetails: Record<string, BasicVaultDetailsType> = {
         baseApr7d: 0.018,
         nodoApr: 0.0065,
         campaigns: [
-          { label: "OKX Boost", apr: 0.0442 },
+          { label: "OKX Campaign APR", apr: 0.0442 },
         ],
         totalApr: 0.018 + 0.0065 + 0.0442,
         totalApy: Math.pow(1 + (0.018 + 0.0065 + 0.0442) / 365, 365) - 1,

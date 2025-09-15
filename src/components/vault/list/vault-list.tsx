@@ -152,7 +152,9 @@ export default function VaultList() {
           vault?.ndlp_price_usd
         )
       );
-      const vault_apy = Number(vault?.vault_apy || 0);
+      const apyBreakdown = (vault as any)?.metadata?.apyBreakdown as any;
+      const apyDecimal = typeof apyBreakdown?.totalApy === "number" ? apyBreakdown.totalApy : undefined;
+      const vault_apy = apyDecimal != null ? apyDecimal * 100 : Number(vault?.vault_apy || 0);
       const exchange = EXCHANGE_CODES_MAP[vault?.exchange_id];
       const tokens = vault.pool.pool_name.split("-");
 
@@ -196,9 +198,11 @@ export default function VaultList() {
         user_holdings_show: showUsd(user_holdings),
         total_value_usd_show: showUsd(vault?.total_value_usd),
         rewards_24h_usd_show: showUsd(vault?.rewards_24h_usd),
-        vault_apy_show: vault?.vault_apy
-          ? formatPercentage(vault_apy < 0 ? 0 : vault_apy)
-          : "--",
+        vault_apy_show:
+          vault_apy == null || Number.isNaN(vault_apy)
+            ? "--"
+            : `${(Math.max(0, vault_apy)).toFixed(1)}%`,
+        apyBreakdown: apyBreakdown,
         rewards_earned_show: !Number(user_holdings)
           ? "--"
           : "+" + showUsd(withdrawal_vault?.user_reward_earned_usd || "0"),
