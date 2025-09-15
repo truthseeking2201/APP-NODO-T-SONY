@@ -85,7 +85,7 @@ export function MyReferralsDashboardModal({
 
   const defaultParamsRefer = {
     page: 1,
-    limit: 10,
+    limit: 15,
     address: "",
     timeSelect: TIME_FILTER.all,
     dateSort: SORT_TYPE.desc,
@@ -124,8 +124,22 @@ export function MyReferralsDashboardModal({
   const initData = useCallback(async () => {
     setIsLoading(true);
     try {
+      // Helper to generate 1,000 mock referral rows when BE data is missing
+      const genMockReferrals = (n = 1000) =>
+        Array.from({ length: n }).map((_, i) => ({
+          id: i + 1,
+          address: `0xUSER_${String(i + 1).padStart(4, "0")}`,
+          dateJoin: new Date(Date.now() - i * 60 * 60 * 1000).toISOString(),
+          depositAmount: Number((Math.random() * 10000).toFixed(2)),
+        }));
+
       if (!address) {
-        setListRefer([]);
+        // No wallet: show mock data for demo/testing (paginated)
+        const mock = genMockReferrals(1000);
+        const start = (paramsRefer.page - 1) * paramsRefer.limit;
+        const end = paramsRefer.page * paramsRefer.limit;
+        setListRefer(mock.slice(start, end));
+        setTotalRefer(mock.length);
         return;
       }
 
@@ -152,12 +166,25 @@ export function MyReferralsDashboardModal({
           depositAmount: el?.total_deposit || 0,
         };
       });
-      setListRefer(data);
-      setTotalRefer(response?.total || 0);
+      const finalData = data && data.length ? data : genMockReferrals(1000);
+      const start = (paramsRefer.page - 1) * paramsRefer.limit;
+      const end = paramsRefer.page * paramsRefer.limit;
+      setListRefer(finalData.slice(start, end));
+      setTotalRefer(response?.total || finalData.length);
       // setTotalRefer(100);
     } catch (error) {
       console.log(error);
-      setListRefer([]);
+      // On error: still show mock data for demo/testing
+      const mock = Array.from({ length: 1000 }).map((_, i) => ({
+        id: i + 1,
+        address: `0xUSER_${String(i + 1).padStart(4, "0")}`,
+        dateJoin: new Date(Date.now() - i * 60 * 60 * 1000).toISOString(),
+        depositAmount: Number((Math.random() * 10000).toFixed(2)),
+      }));
+      const start = (paramsRefer.page - 1) * paramsRefer.limit;
+      const end = paramsRefer.page * paramsRefer.limit;
+      setListRefer(mock.slice(start, end));
+      setTotalRefer(mock.length);
     }
     setIsLoading(false);
   }, [address, paramsRefer]);

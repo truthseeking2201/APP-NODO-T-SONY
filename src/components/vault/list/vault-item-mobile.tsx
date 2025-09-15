@@ -96,7 +96,7 @@ const VaultItemMobile = ({
               label=""
               tooltipContent={
                 <ApyTooltipContent
-                  variant="listing"
+                  variant="detail"
                   apy={(item as any).apyBreakdown as ApyBreakdown}
                 />
               }

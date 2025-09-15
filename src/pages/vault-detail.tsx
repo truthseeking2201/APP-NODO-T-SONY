@@ -67,7 +67,7 @@ const VaultDetail = () => {
     navigate("/", { replace: true });
   };
 
-  const { unit: viewUnit, suiPriceUsd, ensureSuiPrice } = useValueUnitStore();
+  const { unit: viewUnit, suiPriceUsd, ensureSuiPrice, setUnit } = useValueUnitStore();
   if (viewUnit === 'SUI') ensureSuiPrice();
 
   const vaultInfo = useMemo(() => {
@@ -182,7 +182,6 @@ const VaultDetail = () => {
           { value: "overview", label: "Overview" },
           { value: "holdings", label: "Your Holdings" },
         ]}
-        className="mt-2"
       />
 
       {tab === "overview" && (
@@ -210,13 +209,11 @@ const VaultDetail = () => {
     </div>
   );
 
-  const RightColumn = (
-    <ManageLiquidityCard vault_id={vault_id as string} />
-  );
+  const RightColumn = <ManageLiquidityCard vault_id={vault_id as string} />;
 
   return (
     <PageContainer backgroundImage={DetailsBackground} className="vault-page max-md:py-0 py-0 pb-[160px]">
-      <StickyAsideLayout header={Header} left={LeftColumn} right={RightColumn} topOffsetPx={36} />
+      <StickyAsideLayout header={Header} left={LeftColumn} right={RightColumn} topOffsetPx={0} />
     </PageContainer>
   );
 };

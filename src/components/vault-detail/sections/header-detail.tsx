@@ -121,6 +121,7 @@ const HeaderDetail = ({
     setUnit(u);
     if (u === 'SUI') ensureSuiPrice();
   };
+  
 
   if (isMobile) {
     if (isDetailLoading) {
@@ -145,9 +146,9 @@ const HeaderDetail = ({
       );
     }
     return (
-      <header className="mb-6 flex items-center justify-between">
+      <header className="mb-6">
         <div className="w-full flex items-center justify-between">
-          <div>
+          <div className="flex items-start gap-4">
             <PairIcons tokens={tokens} />
             <ShinyText
               text={vault.vault_name}
@@ -178,17 +179,18 @@ const HeaderDetail = ({
               <div className="text-white text-sm font-bold">SUI</div>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-white/60 text-xs">View by</span>
-              <Tabs value={viewUnit} onValueChange={onChangeUnit}>
-                <TabsList className="p-1 flex gap-1">
-                  <TabsTrigger value="$">$</TabsTrigger>
-                  <TabsTrigger value="SUI">SUI</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            <Statistic vaultInfo={vaultInfo} isMobile={isMobile} />
+          <Statistic vaultInfo={vaultInfo} isMobile={isMobile} />
+        </div>
+        {/* View by row: right-aligned, small top spacing */}
+        <div className="mt-2 w-full flex justify-end">
+          <div className="flex items-center gap-2">
+            <span className="text-white/60 text-xs">View by</span>
+            <Tabs value={viewUnit} onValueChange={onChangeUnit}>
+              <TabsList className="p-1 flex gap-1">
+                <TabsTrigger value="$">$</TabsTrigger>
+                <TabsTrigger value="SUI">SUI</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </div>
       </header>
@@ -240,18 +242,18 @@ const HeaderDetail = ({
       <ConditionRenderer
         when={isDetailLoading}
         fallback={
-          <div className="flex items-end gap-10">
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex items-center gap-2">
-                <span className="text-white/60 text-xs">View by</span>
-                <Tabs value={viewUnit} onValueChange={onChangeUnit}>
-                  <TabsList className="p-1 flex gap-1">
-                    <TabsTrigger value="$">$</TabsTrigger>
-                    <TabsTrigger value="SUI">SUI</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+          <div className="flex flex-col items-end gap-2 w-full">
+            <div className="flex items-end gap-10 w-full justify-end">
               <Statistic vaultInfo={vaultInfo} isMobile={isMobile} />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-white/60 text-xs">View by</span>
+              <Tabs value={viewUnit} onValueChange={onChangeUnit}>
+                <TabsList className="p-1 flex gap-1">
+                  <TabsTrigger value="$">$</TabsTrigger>
+                  <TabsTrigger value="SUI">SUI</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
           </div>
         }
