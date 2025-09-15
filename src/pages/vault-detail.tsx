@@ -25,6 +25,7 @@ import { BasicVaultDetailsType } from "@/types/vault-config.types";
 import ApyTooltipContent from "@/components/apy/ApyTooltipContent";
 import type { ApyBreakdown } from "@/types/apy.types";
 import { useMemo } from "react";
+import { useValueUnitStore, convertUsd } from "@/store/valueUnit";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import useBreakpoint from "@/hooks/use-breakpoint";
 
@@ -66,9 +67,18 @@ const VaultDetail = () => {
     navigate("/", { replace: true });
   };
 
+  const { unit: viewUnit, suiPriceUsd, ensureSuiPrice } = useValueUnitStore();
+  if (viewUnit === 'SUI') ensureSuiPrice();
+
   const vaultInfo = useMemo(() => {
     const apyBreakdown = (vaultDetails as any)?.apyBreakdown || (vaultDetails as any)?.metadata?.apyBreakdown;
     const apyPct = typeof apyBreakdown?.totalApy === "number" ? apyBreakdown.totalApy * 100 : Number(vaultDetails?.vault_apy);
+    const tvlUsd = Number((vaultDetails as any)?.total_value_usd ?? 0);
+    const rewUsd = Number((vaultDetails as any)?.rewards_24h_usd ?? 0);
+    const ndlpUsd = Number((vaultDetails as any)?.ndlp_price_usd ?? 0);
+    const tvlDisplay = convertUsd(tvlUsd, viewUnit, suiPriceUsd);
+    const rewDisplay = convertUsd(rewUsd, viewUnit, suiPriceUsd);
+    const ndlpDisplay = viewUnit === '$' ? ndlpUsd : (suiPriceUsd ? ndlpUsd / suiPriceUsd : 0);
     return [
       {
         label: "APY",
@@ -92,37 +102,33 @@ const VaultDetail = () => {
         label: "TVL",
         tooltip: "Total Liquidity Value at the current market price",
         value: !isLoadingVaultDetails
-          ? formatAmount({
-              amount: vaultDetails?.total_value_usd,
-            })
+          ? formatAmount({ amount: tvlDisplay, precision: 2, stripZero: false })
           : "--",
-        prefix: "$",
+        prefix: viewUnit === '$' ? "$" : undefined,
+        suffix: viewUnit === 'SUI' ? " SUI" : undefined,
       },
       {
         label: "24h Rewards",
         tooltip:
           "Total LP fees and token incentives earned by the vault in the last 24 hours. Updates every 1 hour.",
         value: !isLoadingVaultDetails
-          ? formatAmount({
-              amount: vaultDetails?.rewards_24h_usd,
-            })
+          ? formatAmount({ amount: rewDisplay, precision: 2, stripZero: false })
           : "--",
-        prefix: "$",
+        prefix: viewUnit === '$' ? "$" : undefined,
+        suffix: viewUnit === 'SUI' ? " SUI" : undefined,
       },
       {
         label: "NDLP Price",
         tooltip:
-          "Price of 1 NDLP token based on the vault’s total value. (Unit USD)",
+          viewUnit === '$' ? "Price of 1 NDLP in USD" : "Price of 1 NDLP in SUI",
         value: !isLoadingVaultDetails
-          ? formatAmount({
-              amount: vaultDetails?.ndlp_price_usd,
-              precision: 4,
-            })
+          ? formatAmount({ amount: ndlpDisplay, precision: 4, stripZero: false })
           : "--",
-        prefix: "$",
+        prefix: viewUnit === '$' ? "$" : undefined,
+        suffix: viewUnit === 'SUI' ? " SUI" : undefined,
       },
     ];
-  }, [vaultDetails, isLoadingVaultDetails]);
+  }, [vaultDetails, isLoadingVaultDetails, viewUnit, suiPriceUsd]);
 
   if ((!vaultDetails || !isValidVault) && !isLoadingVaultDetails) {
     return <Navigate to="/" replace />;

@@ -20,6 +20,7 @@ import {
   formatTime,
   renamingType,
 } from "@/components/vault-detail/activities/utils";
+import { useValueUnitStore, convertUsd } from "@/store/valueUnit";
 
 const DesktopTable = ({
   paginatedTransactions,
@@ -27,6 +28,8 @@ const DesktopTable = ({
   isFetched,
   handleSelectTransaction,
 }) => {
+  const { unit: viewUnit, suiPriceUsd, ensureSuiPrice } = useValueUnitStore();
+  if (viewUnit === 'SUI') ensureSuiPrice();
   return (
     <Table className="w-full border-0">
       <TableHeader className="border-b border-white/20">
@@ -154,12 +157,10 @@ const DesktopTable = ({
                   </div>
                 )}
               </TableCell>
-              <TableCell
-                className={cn(
-                  "font-mono font-medium text-white px-2 flex pt-3.5 border-0"
-                )}
-              >
-                {formatCurrency(tx.value, 0, 0, 2, "currency", "USD")}
+              <TableCell className={cn("font-mono font-medium text-white px-2 flex pt-3.5 border-0")}> 
+                {viewUnit === '$'
+                  ? formatCurrency(tx.value, 0, 0, 2, "currency", "USD")
+                  : `${convertUsd(Number(tx.value || 0), viewUnit, suiPriceUsd).toLocaleString(undefined, { maximumFractionDigits: 4 })} SUI`}
               </TableCell>
               <TableCell
                 className={cn(

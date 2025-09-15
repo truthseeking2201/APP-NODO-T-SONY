@@ -20,6 +20,7 @@ import {
 import { renamingType } from "@/components/vault-detail/activities/utils";
 import ConditionRenderer from "@/components/shared/condition-renderer";
 import ExternalIcon from "@/assets/icons/external-gradient.svg?react";
+import { useValueUnitStore, convertUsd } from "@/store/valueUnit";
 
 const MobileList = ({
   paginatedTransactions,
@@ -30,6 +31,8 @@ const MobileList = ({
   isFetched: boolean;
   handleSelectTransaction: (transaction: any) => void;
 }) => {
+  const { unit: viewUnit, suiPriceUsd, ensureSuiPrice } = useValueUnitStore();
+  if (viewUnit === 'SUI') ensureSuiPrice();
   return (
     <ConditionRenderer
       when={isFetched}
@@ -80,7 +83,11 @@ const MobileList = ({
             <RowTokens tokens={tx.tokens} />
             <RowValue
               label="Value"
-              value={formatCurrency(tx.value, 0, 0, 2, "currency", "USD")}
+              value={
+                viewUnit === '$'
+                  ? formatCurrency(tx.value, 0, 0, 2, "currency", "USD")
+                  : `${convertUsd(Number(tx.value || 0), viewUnit, suiPriceUsd).toLocaleString(undefined, { maximumFractionDigits: 4 })} SUI`
+              }
             />
             <RowTime timestamp={tx.time} />
             <RowAction label="Tx Hash">

@@ -11,6 +11,8 @@ import { BasicVaultDetailsType } from "@/types/vault-config.types";
 import ConditionRenderer from "@/components/shared/condition-renderer";
 import useBreakpoint from "@/hooks/use-breakpoint";
 import { VaultInfo } from "@/pages/vault-detail";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useValueUnitStore } from "@/store/valueUnit";
 
 type VaultInfoProps = {
   vault: any;
@@ -113,6 +115,12 @@ const HeaderDetail = ({
 }: VaultInfoProps) => {
   const { isMd } = useBreakpoint();
   const isMobile = !isMd;
+  const { unit: viewUnit, setUnit, ensureSuiPrice } = useValueUnitStore();
+  const onChangeUnit = (v: string) => {
+    const u = (v === 'SUI' ? 'SUI' : '$') as '$' | 'SUI';
+    setUnit(u);
+    if (u === 'SUI') ensureSuiPrice();
+  };
 
   if (isMobile) {
     if (isDetailLoading) {
@@ -170,7 +178,18 @@ const HeaderDetail = ({
               <div className="text-white text-sm font-bold">SUI</div>
             </div>
           </div>
-          <Statistic vaultInfo={vaultInfo} isMobile={isMobile} />
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-white/60 text-xs">View by</span>
+              <Tabs value={viewUnit} onValueChange={onChangeUnit}>
+                <TabsList className="p-1 flex gap-1">
+                  <TabsTrigger value="$">$</TabsTrigger>
+                  <TabsTrigger value="SUI">SUI</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            <Statistic vaultInfo={vaultInfo} isMobile={isMobile} />
+          </div>
         </div>
       </header>
     );
@@ -222,7 +241,18 @@ const HeaderDetail = ({
         when={isDetailLoading}
         fallback={
           <div className="flex items-end gap-10">
-            <Statistic vaultInfo={vaultInfo} isMobile={isMobile} />
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-white/60 text-xs">View by</span>
+                <Tabs value={viewUnit} onValueChange={onChangeUnit}>
+                  <TabsList className="p-1 flex gap-1">
+                    <TabsTrigger value="$">$</TabsTrigger>
+                    <TabsTrigger value="SUI">SUI</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+              <Statistic vaultInfo={vaultInfo} isMobile={isMobile} />
+            </div>
           </div>
         }
       >
